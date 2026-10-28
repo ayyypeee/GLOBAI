@@ -1,121 +1,180 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const ROLES = ['Student', 'Teacher']
+
+const DEMO_CREDENTIALS = {
+  Student: { email: 'student@school.edu', password: 'student123' },
+  Teacher: { email: 'teacher@school.edu', password: 'teacher123' },
+}
+
+function StudentIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 10 12 5 2 10l10 5 10-5z" />
+      <path d="M6 12v5c3 2 9 2 12 0v-5" />
+    </svg>
+  )
+}
+
+function TeacherIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z" />
+      <path d="M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z" />
+    </svg>
+  )
+}
+
+function MailIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
+    </svg>
+  )
+}
+
+function LockIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="11" width="16" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+  )
+}
+
+function EyeIcon({ open }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
+      {!open && <path d="M3 3l18 18" />}
+    </svg>
+  )
+}
+
+function RoleTabs({ role, onChange }) {
+  const icons = { Student: <StudentIcon />, Teacher: <TeacherIcon /> }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
+    <div className="role-tabs">
+      {ROLES.map((item) => (
         <button
+          key={item}
           type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+          className={role === item ? 'role-tab active' : 'role-tab'}
+          onClick={() => onChange(item)}
         >
-          Count is {count}
+          {icons[item]}
+          <span>{item}</span>
         </button>
-      </section>
+      ))}
+    </div>
+  )
+}
 
-      <div className="ticks"></div>
+function InputField({ label, icon, type, value, placeholder, onChange, trailing, labelRight }) {
+  return (
+    <div className="field">
+      <div className="field-label-row">
+        <label>{label}</label>
+        {labelRight}
+      </div>
+      <div className="input-wrap">
+        <span className="input-icon">{icon}</span>
+        <input
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        {trailing}
+      </div>
+    </div>
+  )
+}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+function App() {
+  const [role, setRole] = useState('Student')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [remember, setRemember] = useState(true)
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+  const fillDemo = () => {
+    setEmail(DEMO_CREDENTIALS[role].email)
+    setPassword(DEMO_CREDENTIALS[role].password)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+  }
+
+  return (
+    <div className="page">
+      <div className="login-card">
+        <h1>WELCOME</h1>
+        <RoleTabs role={role} onChange={setRole} />
+
+        <form onSubmit={handleSubmit}>
+          <InputField
+            label="Email address"
+            icon={<MailIcon />}
+            type="email"
+            value={email}
+            placeholder="you@school.edu"
+            onChange={setEmail}
+          />
+
+          <InputField
+            label="Password"
+            icon={<LockIcon />}
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            placeholder="Enter your password"
+            onChange={setPassword}
+            labelRight={
+              <a href="#" className="link small">
+                Forgot password?
+              </a>
+            }
+            trailing={
+              <button
+                type="button"
+                className="toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <EyeIcon open={showPassword} />
+              </button>
+              
+            }
+            
+          />
+
+          <label className="remember">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+            />
+            <span>Remember me</span>
+          </label>
+
+          <button type="submit" className="submit-btn">
+            Login in as {role}
+          </button>
+
+        </form>
+
+        <p className="footer-text">
+          Don't have an account?{' '}
+          <a href="#" className="link">
+            Contact school administrator
+          </a>
+        </p>
+      </div>
+    </div>
   )
 }
 
