@@ -107,9 +107,7 @@ function ForgotPassword({ onBack }) {
     <div className="page">
       <div className="login-card">
         <h1>FORGOT PASSWORD</h1>
-        <p className="subtitle">
-          Enter your email and we'll send you a link to reset your password.
-        </p>
+        
 
         {sent ? (
           <>
@@ -127,7 +125,7 @@ function ForgotPassword({ onBack }) {
               icon={<MailIcon />}
               type="email"
               value={email}
-              placeholder="you@school.edu"
+              placeholder="Enter your school email"
               onChange={setEmail}
             />
 
