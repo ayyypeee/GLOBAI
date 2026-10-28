@@ -74,12 +74,11 @@ function RoleTabs({ role, onChange }) {
   )
 }
 
-function InputField({ label, icon, type, value, placeholder, onChange, trailing, labelRight }) {
+function InputField({ label, icon, type, value, placeholder, onChange, trailing }) {
   return (
     <div className="field">
       <div className="field-label-row">
         <label>{label}</label>
-        {labelRight}
       </div>
       <div className="input-wrap">
         <span className="input-icon">{icon}</span>
@@ -127,30 +126,28 @@ function App() {
             onChange={setEmail}
           />
 
-          <InputField
-            label="Password"
-            icon={<LockIcon />}
-            type={showPassword ? 'text' : 'password'}
-            value={password}
-            placeholder="Enter your password"
-            onChange={setPassword}
-            labelRight={
-              <a href="#" className="link small">
-                Forgot password?
-              </a>
-            }
-            trailing={
-              <button
-                type="button"
-                className="toggle-btn"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <EyeIcon open={showPassword} />
-              </button>
-              
-            }
-            
-          />
+          <div className="password-group">
+            <InputField
+              label="Password"
+              icon={<LockIcon />}
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              placeholder="Enter your password"
+              onChange={setPassword}
+              trailing={
+                <button
+                  type="button"
+                  className="toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <EyeIcon open={showPassword} />
+                </button>
+              }
+            />
+            <a href="#" className="link small forgot-link">
+              Forgot password?
+            </a>
+          </div>
 
           <label className="remember">
             <input
@@ -164,7 +161,6 @@ function App() {
           <button type="submit" className="submit-btn">
             Login in as {role}
           </button>
-
         </form>
 
         <p className="footer-text">
