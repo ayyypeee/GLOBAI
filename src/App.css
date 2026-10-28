@@ -174,3 +174,15 @@
 .link.small {
   font-size: 13px;
 }
+.password-group {
+  margin-bottom: 18px;
+}
+
+.password-group .field {
+  margin-bottom: 8px;
+}
+
+.forgot-link {
+  display: block;
+  text-align: right;
+}
