@@ -94,12 +94,73 @@ function InputField({ label, icon, type, value, placeholder, onChange, trailing 
   )
 }
 
+function ForgotPassword({ onBack }) {
+  const [email, setEmail] = useState('')
+  const [sent, setSent] = useState(false)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setSent(true)
+  }
+
+  return (
+    <div className="page">
+      <div className="login-card">
+        <h1>FORGOT PASSWORD</h1>
+        <p className="subtitle">
+          Enter your email and we'll send you a link to reset your password.
+        </p>
+
+        {sent ? (
+          <>
+            <p className="success-msg">
+              If an account exists for <strong>{email}</strong>, a reset link has been sent.
+            </p>
+            <button type="button" className="submit-btn" onClick={onBack}>
+              Back to login
+            </button>
+          </>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <InputField
+              label="Email address"
+              icon={<MailIcon />}
+              type="email"
+              value={email}
+              placeholder="you@school.edu"
+              onChange={setEmail}
+            />
+
+            <button type="submit" className="submit-btn">
+              Reset password
+            </button>
+
+            <p className="footer-text">
+              <a
+                href="#"
+                className="link"
+                onClick={(e) => {
+                  e.preventDefault()
+                  onBack()
+                }}
+              >
+                Back to login
+              </a>
+            </p>
+          </form>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const [role, setRole] = useState('Student')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(true)
+  const [view, setView] = useState('login')
 
   const fillDemo = () => {
     setEmail(DEMO_CREDENTIALS[role].email)
@@ -108,6 +169,10 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+  }
+
+  if (view === 'forgot') {
+    return <ForgotPassword onBack={() => setView('login')} />
   }
 
   return (
@@ -144,7 +209,14 @@ function App() {
                 </button>
               }
             />
-            <a href="#" className="link small forgot-link">
+            <a
+              href="#"
+              className="link small forgot-link"
+              onClick={(e) => {
+                e.preventDefault()
+                setView('forgot')
+              }}
+            >
               Forgot password?
             </a>
           </div>

@@ -186,3 +186,12 @@
   display: block;
   text-align: right;
 }
+.success-msg {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 10px;
+  color: #065f46;
+  font-size: 14px;
+}
