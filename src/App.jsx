@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import './App.css'
+import { login } from './api'
+import StudentDashboard from './pages/StudentDashboard'
+import TeacherDashboard from './pages/TeacherDashboard'
 
 const ROLES = ['Student', 'Teacher']
-
-const DEMO_CREDENTIALS = {
-  Student: { email: 'student@school.edu', password: 'student123' },
-  Teacher: { email: 'teacher@school.edu', password: 'teacher123' },
-}
 
 function StudentIcon() {
   return (
@@ -31,6 +29,14 @@ function MailIcon() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <path d="m3 7 9 6 9-6" />
+    </svg>
+  )
+}
+function UserIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />
     </svg>
   )
 }
@@ -154,19 +160,43 @@ function ForgotPassword({ onBack }) {
 
 function App() {
   const [role, setRole] = useState('Student')
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(true)
   const [view, setView] = useState('login')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState(null)
 
-  const fillDemo = () => {
-    setEmail(DEMO_CREDENTIALS[role].email)
-    setPassword(DEMO_CREDENTIALS[role].password)
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      const result = await login(username, password)
+      if (result.role !== role.toUpperCase()) {
+        throw new Error(`This is not a ${role.toLowerCase()} account`)
+      }
+      setUser(result)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleLogout = () => {
+    setUser(null)
+    setPassword('')
+  }
+
+  if (user) {
+    return user.role === 'TEACHER' ? (
+      <TeacherDashboard user={user} onLogout={handleLogout} />
+    ) : (
+      <StudentDashboard user={user} onLogout={handleLogout} />
+    )
   }
 
   if (view === 'forgot') {
@@ -181,12 +211,12 @@ function App() {
 
         <form onSubmit={handleSubmit}>
           <InputField
-            label="Email address"
-            icon={<MailIcon />}
-            type="email"
-            value={email}
-            placeholder="you@school.edu"
-            onChange={setEmail}
+            label="Username"
+            icon={<UserIcon />}
+            type="text"
+            value={username}
+            placeholder={role === 'Student' ? 'student' : 'teacher'}
+            onChange={setUsername}
           />
 
           <div className="password-group">
@@ -228,8 +258,10 @@ function App() {
             <span>Remember me</span>
           </label>
 
-          <button type="submit" className="submit-btn">
-            Login in as {role}
+          {error && <p className="error-msg">{error}</p>}
+
+          <button type="submit" className="submit-btn" disabled={loading}>
+            {loading ? 'Logging in...' : `Login in as ${role}`}
           </button>
         </form>
 
