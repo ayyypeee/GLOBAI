@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '../components/DashboardLayout'
 import { Stats, Table, Announcements } from '../components/Parts'
-import { getDashboard } from '../api'
+import { getDashboard, getStudentAttendance } from '../api'
 
 const NAV = [
   { key: 'home', label: 'Home', icon: 'home' },
@@ -23,9 +23,10 @@ const gradeCols = [
   { key: 'grade', label: 'Current grade' },
 ]
 const attCols = [
-  { key: 'code', label: 'Course' },
-  { key: 'title', label: 'Title' },
-  { key: 'attendance', label: 'Attendance' },
+  { key: 'courseCode', label: 'Course' },
+  { key: 'courseTitle', label: 'Title' },
+  { key: 'date', label: 'Date' },
+  { key: 'status', label: 'Status' },
 ]
 const quizCols = [
   { key: 'title', label: 'Quiz' },
@@ -44,10 +45,29 @@ export default function StudentDashboard({ user, onLogout }) {
   const [view, setView] = useState('home')
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const [attendanceRecords, setAttendanceRecords] = useState([])
+  const [attendanceLoading, setAttendanceLoading] = useState(false)
+  const [attendanceError, setAttendanceError] = useState('')
 
   useEffect(() => {
     getDashboard('student').then(setData).catch((e) => setError(e.message))
   }, [])
+
+  useEffect(() => {
+    if (view !== 'attendance') return
+    if (!user.studentId) {
+      setAttendanceRecords([])
+      setAttendanceError('This demo account does not have a student ID.')
+      return
+    }
+
+    setAttendanceLoading(true)
+    setAttendanceError('')
+    getStudentAttendance(user.studentId)
+      .then(setAttendanceRecords)
+      .catch((e) => setAttendanceError(e.message))
+      .finally(() => setAttendanceLoading(false))
+  }, [view, user.studentId])
 
   let body = <p className="empty">Loading...</p>
   if (error) {
@@ -71,7 +91,22 @@ export default function StudentDashboard({ user, onLogout }) {
         </>
       ),
       grades: <><h1>Grades</h1><Table cols={gradeCols} rows={data.courses} /></>,
-      attendance: <><h1>Attendance</h1><Table cols={attCols} rows={data.courses} /></>,
+      attendance: (
+        <>
+          <h1>Attendance</h1>
+          {attendanceError ? (
+            <p className="empty">{attendanceError}</p>
+          ) : attendanceLoading ? (
+            <p className="empty">Loading attendance...</p>
+          ) : (
+            <Table
+              cols={attCols}
+              rows={attendanceRecords}
+              empty="No attendance has been saved for this demo student yet."
+            />
+          )}
+        </>
+      ),
       quizzes: <><h1>Quizzes</h1><Table cols={quizCols} rows={data.quizzes} /></>,
       concerns: <><h1>Grade concerns</h1><Table cols={concernCols} rows={data.concerns} empty="You have not submitted any concerns." /></>,
       announcements: <><h1>Announcements</h1><Announcements items={data.announcements} /></>,

@@ -20,3 +20,22 @@ export async function getDashboard(role) {
   if (!res.ok) throw new Error('Could not load dashboard data')
   return res.json()
 }
+
+export async function saveAttendance(courseCode, date, entries) {
+  const res = await fetch(`${BASE}/api/attendance`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ courseCode, date, entries }),
+  })
+  if (!res.ok) {
+    const message = await res.text()
+    throw new Error(message || 'Could not save attendance')
+  }
+  return res.json()
+}
+
+export async function getStudentAttendance(studentId) {
+  const res = await fetch(`${BASE}/api/attendance/student/${encodeURIComponent(studentId)}`)
+  if (!res.ok) throw new Error('Could not load attendance records')
+  return res.json()
+}

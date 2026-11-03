@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     record LoginRequest(String username, String password) {}
-    record UserInfo(String username, String role, String name, String email) {}
+    record UserInfo(String username, String role, String name, String email, String studentId) {}
 
     // Temporary hard-coded accounts. Replace with the User table (hashed passwords) later.
     private static final Map<String, UserInfo> USERS = Map.of(
-        "student", new UserInfo("student", "STUDENT", "Student", "student@school.edu"),
-        "teacher", new UserInfo("teacher", "TEACHER", "Teacher", "teacher@school.edu")
+        "student", new UserInfo("student", "STUDENT", "Student", "student@school.edu", "2000000"),
+        "teacher", new UserInfo("teacher", "TEACHER", "Teacher", "teacher@school.edu", null)
     );
     private static final String PASSWORD = "12345";
 

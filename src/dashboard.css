@@ -99,3 +99,134 @@ td { padding: 11px 12px; border-bottom: 1px solid #eef2f7; }
   .nav-sub { display: none; }
   .who { display: none; }
 }
+.course-link,
+.back-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1d3fd8;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.course-link {
+  border-radius: 4px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.course-link:hover {
+  color: #1731b0;
+  background: #e8f3fd;
+}
+
+.course-link:focus-visible {
+  outline: 2px solid #1d3fd8;
+  outline-offset: 3px;
+}
+
+.back-btn {
+  margin-bottom: 18px;
+}
+
+.attendance-date {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 12px;
+}
+
+.attendance-date input {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.attendance-note {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.attendance-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.attendance-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.save-attendance-btn {
+  margin-top: 18px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #1d3fd8;
+  color: #fff;
+  font-weight: 600;
+}
+
+.save-attendance-btn:hover:not(:disabled) {
+  background: #1731b0;
+}
+
+.save-attendance-btn:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.pill.present { background: #d1fae5; color: #065f46; }
+.pill.absent { background: #fee2e2; color: #991b1b; }
+.pill.excused { background: #dbeafe; color: #1e40af; }
+.pill.late { background: #fef3c7; color: #92400e; }
+
+.attendance-course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.attendance-course-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 132px;
+  padding: 18px;
+  border: 1px solid #dbe7f5;
+  border-radius: 12px;
+  background: #fffdf7;
+  color: #111827;
+  text-align: left;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.attendance-course-card strong {
+  color: #1d2a8a;
+  font-size: 17px;
+}
+
+.attendance-course-card span {
+  font-weight: 600;
+}
+
+.attendance-course-card small {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.attendance-course-card:hover {
+  transform: translateY(-2px);
+  border-color: #1d3fd8;
+  background: #f1f6ff;
+  box-shadow: 0 8px 20px rgba(29, 63, 216, 0.12);
+}
+
+.attendance-course-card:focus-visible {
+  outline: 2px solid #1d3fd8;
+  outline-offset: 3px;
+}
