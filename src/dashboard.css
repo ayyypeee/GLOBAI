@@ -10,7 +10,6 @@
 .shell button { font: inherit; cursor: pointer; }
 .shell button:focus-visible { outline: 2px solid #1d3fd8; outline-offset: 2px; }
 
-/* top bar */
 .topbar {
   grid-column: 1 / -1;
   display: flex;
@@ -46,7 +45,6 @@
   border: 0; background: none; padding: 10px 18px; color: #1d3fd8;
 }
 
-/* sidebar */
 .sidebar { background: #fffdf7; padding: 10px 0; border-right: 1px solid #dbe7f5; }
 .nav-item {
   width: 100%; display: flex; align-items: center; gap: 12px;
@@ -62,7 +60,6 @@
 }
 .nav-sub.current { color: #1d3fd8; font-weight: 600; }
 
-/* content */
 .main { padding: 14px 16px 30px; }
 .crumb { text-align: right; padding: 4px 8px 10px; font-size: 15px; color: #1f2937; }
 .panel {
