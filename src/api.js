@@ -39,3 +39,21 @@ export async function getStudentAttendance(studentId) {
   if (!res.ok) throw new Error('Could not load attendance records')
   return res.json()
 }
+
+export async function register(data) {
+  let res
+  try {
+    res = await fetch(`${BASE}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+  } catch {
+    throw new Error('Cannot reach the server. Is the backend running?')
+  }
+  if (!res.ok) {
+    const message = await res.text()
+    throw new Error(message || 'Could not create account')
+  }
+  return res.json()
+}

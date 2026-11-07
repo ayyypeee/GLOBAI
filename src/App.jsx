@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.css'
-import { login } from './api'
+import { login, register } from './api'
 import StudentDashboard from './pages/StudentDashboard'
 import TeacherDashboard from './pages/TeacherDashboard'
 
@@ -158,6 +158,89 @@ function ForgotPassword({ onBack }) {
   )
 }
 
+function Register({ onBack }) {
+  const [role, setRole] = useState('Student')
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [studentId, setStudentId] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    if (password !== confirm) {
+      setError('Passwords do not match')
+      return
+    }
+    setLoading(true)
+    try {
+      await register({ username, password, name, email, role, studentId })
+      setDone(true)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="page">
+      <div className="login-card">
+        <h1>REGISTER</h1>
+
+        {done ? (
+          <>
+            <p className="success-msg">
+              Account created! You can now log in as <strong>{username}</strong>.
+            </p>
+            <button type="button" className="submit-btn" onClick={onBack}>
+              Back to login
+            </button>
+          </>
+        ) : (
+          <>
+            <RoleTabs role={role} onChange={setRole} />
+            <form onSubmit={handleSubmit}>
+              <InputField label="Full name" icon={<UserIcon />} type="text"
+                value={name} placeholder="Enter your full name" onChange={setName} />
+              <InputField label="Email address" icon={<MailIcon />} type="email"
+                value={email} placeholder="Enter your school email" onChange={setEmail} />
+              {role === 'Student' && (
+                <InputField label="Student ID" icon={<UserIcon />} type="text"
+                  value={studentId} placeholder="e.g. 240730586" onChange={setStudentId} />
+              )}
+              <InputField label="Username" icon={<UserIcon />} type="text"
+                value={username} placeholder="Choose a username" onChange={setUsername} />
+              <InputField label="Password" icon={<LockIcon />} type="password"
+                value={password} placeholder="At least 6 characters" onChange={setPassword} />
+              <InputField label="Confirm password" icon={<LockIcon />} type="password"
+                value={confirm} placeholder="Re-enter your password" onChange={setConfirm} />
+
+              {error && <p className="error-msg">{error}</p>}
+
+              <button type="submit" className="submit-btn" disabled={loading}>
+                {loading ? 'Creating account...' : `Register as ${role}`}
+              </button>
+
+              <p className="footer-text">
+                Already have an account?{' '}
+                <a href="#" className="link" onClick={(e) => { e.preventDefault(); onBack() }}>
+                  Back to login
+                </a>
+              </p>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const [role, setRole] = useState('Student')
   const [username, setUsername] = useState('')
@@ -200,8 +283,12 @@ function App() {
   }
 
   if (view === 'forgot') {
-    return <ForgotPassword onBack={() => setView('login')} />
-  }
+  return <ForgotPassword onBack={() => setView('login')} />
+}
+
+if (view === 'register') {
+  return <Register onBack={() => setView('login')} />
+}
 
   return (
     <div className="page">
@@ -266,10 +353,10 @@ function App() {
         </form>
 
         <p className="footer-text">
-          Don't have an account?{' '}
-          <a href="#" className="link">
-            Contact school administrator
-          </a>
+        Don't have an account?{' '}
+        <a href="#" className="link" onClick={(e) => { e.preventDefault(); setView('register') }}>
+        Register here
+        </a>
         </p>
       </div>
     </div>
