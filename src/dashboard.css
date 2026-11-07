@@ -227,3 +227,40 @@ td { padding: 11px 12px; border-bottom: 1px solid #eef2f7; }
   outline: 2px solid #1d3fd8;
   outline-offset: 3px;
 }
+
+/* ---------- Admin preview switch ---------- */
+.admin-switch {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #c9d1dc;
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+}
+
+.admin-switch span {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.admin-switch button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 999px;
+  background: #e5e9f0;
+  color: #1f2937;
+  font: inherit;
+  cursor: pointer;
+}
+
+.admin-switch button.active {
+  background: #1d2a8a;
+  color: #ffffff;
+}

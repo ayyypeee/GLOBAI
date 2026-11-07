@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import './App.css'
-import { login, register } from './api'
+import { login, register, forgotPassword, resetPassword } from './api'
 import StudentDashboard from './pages/StudentDashboard'
 import TeacherDashboard from './pages/TeacherDashboard'
+import AdminDashboard from './pages/AdminDashboard'
 
-const ROLES = ['Student', 'Teacher']
+const ROLES = ['Student', 'Teacher', 'Admin']
 
 function StudentIcon() {
   return (
@@ -24,6 +25,14 @@ function TeacherIcon() {
   )
 }
 
+function AdminIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" />
+    </svg>
+  )
+}
+
 function MailIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -32,6 +41,7 @@ function MailIcon() {
     </svg>
   )
 }
+
 function UserIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -60,12 +70,19 @@ function EyeIcon({ open }) {
   )
 }
 
-function RoleTabs({ role, onChange }) {
-  const icons = { Student: <StudentIcon />, Teacher: <TeacherIcon /> }
+function RoleTabs({ role, onChange, roles = ROLES }) {
+  const icons = {
+    Student: <StudentIcon />,
+    Teacher: <TeacherIcon />,
+    Admin: <AdminIcon />,
+  }
 
   return (
-    <div className="role-tabs">
-      {ROLES.map((item) => (
+    <div
+      className="role-tabs"
+      style={{ gridTemplateColumns: `repeat(${roles.length}, 1fr)` }}
+    >
+      {roles.map((item) => (
         <button
           key={item}
           type="button"
@@ -102,18 +119,28 @@ function InputField({ label, icon, type, value, placeholder, onChange, trailing 
 
 function ForgotPassword({ onBack }) {
   const [email, setEmail] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSent(true)
+    setError('')
+    setLoading(true)
+    try {
+      await forgotPassword(email)
+      setSent(true)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="page">
       <div className="login-card">
         <h1>FORGOT PASSWORD</h1>
-        
 
         {sent ? (
           <>
@@ -135,8 +162,10 @@ function ForgotPassword({ onBack }) {
               onChange={setEmail}
             />
 
-            <button type="submit" className="submit-btn">
-              Reset password
+            {error && <p className="error-msg">{error}</p>}
+
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? 'Sending...' : 'Send reset link'}
             </button>
 
             <p className="footer-text">
@@ -158,12 +187,83 @@ function ForgotPassword({ onBack }) {
   )
 }
 
+function ResetPassword({ onBack }) {
+  // The token comes from the link: http://localhost:5173/?reset=<token>
+  const token = new URLSearchParams(window.location.search).get('reset') || ''
+  const [newPassword, setNewPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    if (newPassword !== confirm) {
+      setError('Passwords do not match')
+      return
+    }
+    setLoading(true)
+    try {
+      await resetPassword(token, newPassword)
+      setDone(true)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="page">
+      <div className="login-card">
+        <h1>NEW PASSWORD</h1>
+
+        {done ? (
+          <>
+            <p className="success-msg">
+              Your password has been updated. You can now log in.
+            </p>
+            <button type="button" className="submit-btn" onClick={onBack}>
+              Back to login
+            </button>
+          </>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <InputField
+              label="New password"
+              icon={<LockIcon />}
+              type="password"
+              value={newPassword}
+              placeholder="At least 6 characters"
+              onChange={setNewPassword}
+            />
+            <InputField
+              label="Confirm new password"
+              icon={<LockIcon />}
+              type="password"
+              value={confirm}
+              placeholder="Re-enter your new password"
+              onChange={setConfirm}
+            />
+
+            {error && <p className="error-msg">{error}</p>}
+
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? 'Updating...' : 'Reset password'}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function Register({ onBack }) {
   const [role, setRole] = useState('Student')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [studentId, setStudentId] = useState('')
-  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
@@ -179,7 +279,7 @@ function Register({ onBack }) {
     }
     setLoading(true)
     try {
-      await register({ username, password, name, email, role, studentId })
+      await register({ password, name, email, role, studentId })
       setDone(true)
     } catch (err) {
       setError(err.message)
@@ -196,7 +296,7 @@ function Register({ onBack }) {
         {done ? (
           <>
             <p className="success-msg">
-              Account created! You can now log in as <strong>{username}</strong>.
+              Account created! You can now log in with <strong>{email}</strong>.
             </p>
             <button type="button" className="submit-btn" onClick={onBack}>
               Back to login
@@ -204,7 +304,7 @@ function Register({ onBack }) {
           </>
         ) : (
           <>
-            <RoleTabs role={role} onChange={setRole} />
+            <RoleTabs role={role} onChange={setRole} roles={['Student', 'Teacher']} />
             <form onSubmit={handleSubmit}>
               <InputField label="Full name" icon={<UserIcon />} type="text"
                 value={name} placeholder="Enter your full name" onChange={setName} />
@@ -214,8 +314,6 @@ function Register({ onBack }) {
                 <InputField label="Student ID" icon={<UserIcon />} type="text"
                   value={studentId} placeholder="e.g. 240730586" onChange={setStudentId} />
               )}
-              <InputField label="Username" icon={<UserIcon />} type="text"
-                value={username} placeholder="Choose a username" onChange={setUsername} />
               <InputField label="Password" icon={<LockIcon />} type="password"
                 value={password} placeholder="At least 6 characters" onChange={setPassword} />
               <InputField label="Confirm password" icon={<LockIcon />} type="password"
@@ -247,7 +345,10 @@ function App() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(true)
-  const [view, setView] = useState('login')
+  // Open on the reset screen when the page was opened from an emailed link (?reset=<token>)
+  const [view, setView] = useState(() =>
+    new URLSearchParams(window.location.search).get('reset') ? 'reset' : 'login'
+  )
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState(null)
@@ -275,6 +376,9 @@ function App() {
   }
 
   if (user) {
+    if (user.role === 'ADMIN') {
+      return <AdminDashboard user={user} onLogout={handleLogout} />
+    }
     return user.role === 'TEACHER' ? (
       <TeacherDashboard user={user} onLogout={handleLogout} />
     ) : (
@@ -283,12 +387,24 @@ function App() {
   }
 
   if (view === 'forgot') {
-  return <ForgotPassword onBack={() => setView('login')} />
-}
+    return <ForgotPassword onBack={() => setView('login')} />
+  }
 
-if (view === 'register') {
-  return <Register onBack={() => setView('login')} />
-}
+  if (view === 'register') {
+    return <Register onBack={() => setView('login')} />
+  }
+
+  if (view === 'reset') {
+    return (
+      <ResetPassword
+        onBack={() => {
+          // remove ?reset=... from the address bar so a refresh doesn't reopen this screen
+          window.history.replaceState({}, '', '/')
+          setView('login')
+        }}
+      />
+    )
+  }
 
   return (
     <div className="page">
@@ -298,11 +414,11 @@ if (view === 'register') {
 
         <form onSubmit={handleSubmit}>
           <InputField
-            label="Username"
-            icon={<UserIcon />}
+            label="Email"
+            icon={<MailIcon />}
             type="text"
             value={username}
-            placeholder={role === 'Student' ? 'student' : 'teacher'}
+            placeholder="Enter your email"
             onChange={setUsername}
           />
 
@@ -353,10 +469,10 @@ if (view === 'register') {
         </form>
 
         <p className="footer-text">
-        Don't have an account?{' '}
-        <a href="#" className="link" onClick={(e) => { e.preventDefault(); setView('register') }}>
-        Register here
-        </a>
+          Don't have an account?{' '}
+          <a href="#" className="link" onClick={(e) => { e.preventDefault(); setView('register') }}>
+            Register here
+          </a>
         </p>
       </div>
     </div>

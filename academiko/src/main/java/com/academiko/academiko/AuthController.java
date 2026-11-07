@@ -1,6 +1,9 @@
 package com.academiko.academiko;
 
+import java.time.Instant;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.http.ResponseEntity;
@@ -14,62 +17,81 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     record LoginRequest(String username, String password) {}
-    record RegisterRequest(String username, String password, String name,
-                           String email, String role, String studentId) {}
-    record UserInfo(String username, String role, String name, String email, String studentId) {}
-    // An account = the public info + the password (the password is never sent back)
-    record Account(UserInfo info, String password) {}
+    record ForgotRequest(String email) {}
+    record ResetRequest(String token, String newPassword) {}
+    record ResetToken(Long userId, Instant expiresAt) {}
 
-    // A mutable map, so new accounts can be added while the server runs
-    private static final Map<String, Account> ACCOUNTS = new ConcurrentHashMap<>();
+    // token -> which user it belongs to and when it expires (in memory)
+    private static final Map<String, ResetToken> RESET_TOKENS = new ConcurrentHashMap<>();
 
-    static {
-        ACCOUNTS.put("student", new Account(
-            new UserInfo("student", "STUDENT", "Student", "student@school.edu", "2000000"), "12345"));
-        ACCOUNTS.put("teacher", new Account(
-            new UserInfo("teacher", "TEACHER", "Teacher", "teacher@school.edu", null), "12345"));
+    private static final String FRONTEND_URL = "http://localhost:5173";
+
+    private final UserService service;
+
+    public AuthController(UserService service) {
+        this.service = service;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserInfo> login(@RequestBody LoginRequest req) {
-        Account account = req.username() == null ? null : ACCOUNTS.get(req.username().trim().toLowerCase());
-        if (account == null || !account.password().equals(req.password())) {
-            return ResponseEntity.status(401).build();
-        }
-        return ResponseEntity.ok(account.info());
+    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest req) {
+        return service.authenticate(req.username(), req.password())
+                .map(user -> ResponseEntity.ok(UserResponse.from(user)))
+                .orElse(ResponseEntity.status(401).build());
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
-        if (isBlank(req.username()) || isBlank(req.password()) || isBlank(req.name())
-                || isBlank(req.email()) || isBlank(req.role())) {
-            return ResponseEntity.badRequest().body("Please fill in all required fields.");
+    public ResponseEntity<?> register(@RequestBody UserRequest req) {
+        try {
+            return ResponseEntity.status(201).body(UserResponse.from(service.create(req)));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        String role = req.role().trim().toUpperCase();
-        if (!role.equals("STUDENT") && !role.equals("TEACHER")) {
-            return ResponseEntity.badRequest().body("Role must be Student or Teacher.");
-        }
-        if (role.equals("STUDENT") && isBlank(req.studentId())) {
-            return ResponseEntity.badRequest().body("Student ID is required for students.");
-        }
-        if (req.password().length() < 6) {
-            return ResponseEntity.badRequest().body("Password must be at least 6 characters.");
-        }
-
-        String username = req.username().trim().toLowerCase();
-        UserInfo info = new UserInfo(
-            username, role, req.name().trim(), req.email().trim(),
-            role.equals("STUDENT") ? req.studentId().trim() : null);
-
-        // putIfAbsent returns null if the username was free, or the existing account if taken
-        if (ACCOUNTS.putIfAbsent(username, new Account(info, req.password())) != null) {
-            return ResponseEntity.status(409).body("That username is already taken.");
-        }
-        return ResponseEntity.status(201).body(info);
     }
 
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotRequest req) {
+        if (req.email() == null || req.email().isBlank()) {
+            return ResponseEntity.badRequest().body("Email is required.");
+        }
+
+        service.findByEmail(req.email()).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            RESET_TOKENS.put(token, new ResetToken(user.getId(), Instant.now().plusSeconds(30 * 60)));
+            sendResetLink(user.getEmail(), FRONTEND_URL + "/?reset=" + token);
+        });
+
+        // Same answer whether or not the email exists
+        return ResponseEntity.ok("If an account exists for that email, a reset link has been sent.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetRequest req) {
+        if (req.token() == null || req.token().isBlank() || req.newPassword() == null) {
+            return ResponseEntity.badRequest().body("Token and new password are required.");
+        }
+
+        ResetToken resetToken = RESET_TOKENS.get(req.token());
+        if (resetToken == null || resetToken.expiresAt().isBefore(Instant.now())) {
+            RESET_TOKENS.remove(req.token());
+            return ResponseEntity.badRequest().body("This reset link is invalid or has expired.");
+        }
+
+        try {
+            service.changePassword(resetToken.userId(), req.newPassword());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().body("This reset link is invalid or has expired.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        RESET_TOKENS.remove(req.token());   // one-time use
+        return ResponseEntity.ok("Password updated.");
+    }
+
+    // For now the link is printed in the backend terminal. Real email comes later.
+    private void sendResetLink(String email, String link) {
+        System.out.println("PASSWORD RESET LINK for " + email + ": " + link);
     }
 }
