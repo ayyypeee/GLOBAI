@@ -293,7 +293,7 @@ if (view === 'register') {
   return (
     <div className="page">
       <div className="login-card">
-        <h1>WELCOME</h1>
+        <h1>Hello, WELCOME!</h1>
         <RoleTabs role={role} onChange={setRole} />
 
         <form onSubmit={handleSubmit}>
