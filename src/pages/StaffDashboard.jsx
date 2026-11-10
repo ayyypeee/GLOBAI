@@ -89,7 +89,7 @@ function AttendanceChecker({ course, onBack }) {
           status: attendance[student.id],
         })),
       )
-      setSavedMessage('Attendance saved. The demo student can now view their status.')
+      setSavedMessage('Attendance saved. Students can now view their status.')
     } catch (saveError) {
       setError(saveError.message)
     } finally {
@@ -117,7 +117,7 @@ function AttendanceChecker({ course, onBack }) {
       </div>
 
       <p className="attendance-note">
-        Demo only: saved attendance is kept in memory and will be cleared when the backend restarts.
+        Saved attendance is kept in memory and will be cleared when the backend restarts.
       </p>
 
       <div className="table-wrap">
@@ -167,14 +167,14 @@ function AttendanceChecker({ course, onBack }) {
     </>
   )
 }
-export default function TeacherDashboard({ user, onLogout }) {
+export default function StaffDashboard({ user, onLogout }) {
   const [view, setView] = useState('home')
   const [selectedAttendanceCourse, setSelectedAttendanceCourse] = useState(null)
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    getDashboard('teacher').then(setData).catch((e) => setError(e.message))
+    getDashboard('staff').then(setData).catch((e) => setError(e.message))
   }, [])
 
   let body = <p className="empty">Loading...</p>
@@ -238,7 +238,7 @@ export default function TeacherDashboard({ user, onLogout }) {
   return (
     <DashboardLayout
       user={user} nav={NAV} active={view} onNav={setView}
-      onLogout={onLogout} title="Teacher Home"
+      onLogout={onLogout} title="Staff Home"
     >
       {body}
     </DashboardLayout>

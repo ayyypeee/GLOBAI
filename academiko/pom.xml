@@ -8,24 +8,11 @@
 		<version>4.1.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.academiko</groupId>
-	<artifactId>academiko</artifactId>
+	<groupId>com.csit321G5.Globai</groupId>
+	<artifactId>Globai</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>academiko</name>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>Globai</name>
+	<description>Globai academic management system</description>
 	<properties>
 		<java.version>21</java.version>
 	</properties>

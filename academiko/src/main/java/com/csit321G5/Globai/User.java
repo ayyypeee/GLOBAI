@@ -1,4 +1,6 @@
-package com.academiko.academiko;
+package com.csit321G5.Globai;
+
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +12,14 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "users")
 public class User {
+
+    public static final String ADMIN = "ADMIN";
+    public static final String STAFF = "STAFF";
+    public static final String STUDENT = "STUDENT";
+
+    public static final String PENDING = "PENDING";
+    public static final String APPROVED = "APPROVED";
+    public static final String REJECTED = "REJECTED";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +38,15 @@ public class User {
     private String name;
 
     @Column(nullable = false)
-    private String role;        // ADMIN, TEACHER or STUDENT
+    private String role;        // ADMIN, STAFF or STUDENT
+
+    @Column(nullable = false)
+    private String status;      // PENDING, APPROVED or REJECTED (only APPROVED users can log in)
 
     @Column(unique = true)
     private String studentId;   // only for students, null for the others
+
+    private LocalDate createdAt;
 
     public User() {}
 
@@ -53,6 +68,12 @@ public class User {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
     public String getStudentId() { return studentId; }
     public void setStudentId(String studentId) { this.studentId = studentId; }
+
+    public LocalDate getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDate createdAt) { this.createdAt = createdAt; }
 }

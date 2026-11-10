@@ -96,7 +96,6 @@ td { padding: 11px 12px; border-bottom: 1px solid #eef2f7; }
   .nav-sub { display: none; }
   .who { display: none; }
 }
-.course-link,
 .back-btn {
   padding: 0;
   border: 0;
@@ -104,21 +103,6 @@ td { padding: 11px 12px; border-bottom: 1px solid #eef2f7; }
   color: #1d3fd8;
   text-decoration: none;
   cursor: pointer;
-}
-
-.course-link {
-  border-radius: 4px;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.course-link:hover {
-  color: #1731b0;
-  background: #e8f3fd;
-}
-
-.course-link:focus-visible {
-  outline: 2px solid #1d3fd8;
-  outline-offset: 3px;
 }
 
 .back-btn {
@@ -228,39 +212,19 @@ td { padding: 11px 12px; border-bottom: 1px solid #eef2f7; }
   outline-offset: 3px;
 }
 
-/* ---------- Admin preview switch ---------- */
-.admin-switch {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: #ffffff;
-  border: 1px solid #c9d1dc;
-  border-radius: 999px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  font-size: 13px;
-}
+/* ---------- Admin dashboard ---------- */
+.pill.approved { background: #d1fae5; color: #065f46; }
 
-.admin-switch span {
-  color: #6b7280;
+.row-actions { display: flex; gap: 8px; }
+.row-actions button {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 600;
 }
-
-.admin-switch button {
-  padding: 6px 14px;
-  border: none;
-  border-radius: 999px;
-  background: #e5e9f0;
-  color: #1f2937;
-  font: inherit;
-  cursor: pointer;
-}
-
-.admin-switch button.active {
-  background: #1d2a8a;
-  color: #ffffff;
-}
+.row-actions button:disabled { opacity: 0.6; cursor: wait; }
+.btn-approve { background: #1d3fd8; color: #fff; }
+.btn-approve:hover:not(:disabled) { background: #1731b0; }
+.btn-reject, .btn-delete { background: #fee2e2; color: #991b1b; }
+.btn-reject:hover:not(:disabled), .btn-delete:hover:not(:disabled) { background: #fecaca; }

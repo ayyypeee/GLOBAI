@@ -1,4 +1,4 @@
-package com.academiko.academiko;
+package com.csit321G5.Globai;
 
 import java.util.List;
 import java.util.Map;
@@ -31,8 +31,8 @@ public class DashboardController {
         );
     }
 
-    @GetMapping("/teacher/dashboard")
-    public Map<String, Object> teacher() {
+    @GetMapping("/staff/dashboard")
+    public Map<String, Object> staff() {
         return Map.of(
             "summary", Map.of("classes", 3, "students", 96, "activeQuizzes", 2, "openConcerns", 2),
             "classes", List.of(

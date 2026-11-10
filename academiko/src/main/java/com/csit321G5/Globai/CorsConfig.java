@@ -1,4 +1,4 @@
-package com.academiko.academiko;
+package com.csit321G5.Globai;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

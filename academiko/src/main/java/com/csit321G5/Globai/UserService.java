@@ -1,5 +1,6 @@
-package com.academiko.academiko;
+package com.csit321G5.Globai;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -32,19 +33,20 @@ public class UserService {
         return users.findByEmailIgnoreCase(email.trim());
     }
 
-    // ---------- Create (registration: the email is the username) ----------
+    // ---------- Account request (student or staff asks the admin for an account) ----------
+    // The account is saved as PENDING. It cannot log in until the admin approves it.
 
-    public User create(UserRequest req) {
+    public User requestAccount(UserRequest req) {
         if (isBlank(req.password()) || isBlank(req.name())
                 || isBlank(req.email()) || isBlank(req.role())) {
             throw new IllegalArgumentException("Please fill in all required fields.");
         }
 
         String role = req.role().trim().toUpperCase();
-        if (!role.equals("TEACHER") && !role.equals("STUDENT")) {
-            throw new IllegalArgumentException("Role must be Teacher or Student.");
+        if (!role.equals(User.STAFF) && !role.equals(User.STUDENT)) {
+            throw new IllegalArgumentException("Role must be Staff or Student.");
         }
-        if (role.equals("STUDENT") && isBlank(req.studentId())) {
+        if (role.equals(User.STUDENT) && isBlank(req.studentId())) {
             throw new IllegalArgumentException("Student ID is required for students.");
         }
         if (req.password().length() < 6) {
@@ -56,10 +58,10 @@ public class UserService {
             throw new IllegalArgumentException("Enter a valid email address.");
         }
         String username = email.toLowerCase();   // the email is the username
-        String studentId = role.equals("STUDENT") ? req.studentId().trim() : null;
+        String studentId = role.equals(User.STUDENT) ? req.studentId().trim() : null;
 
         if (users.existsByEmailIgnoreCase(email) || users.existsByUsername(username)) {
-            throw new IllegalStateException("That email is already registered.");
+            throw new IllegalStateException("That email already has an account or a pending request.");
         }
         if (studentId != null && users.existsByStudentId(studentId)) {
             throw new IllegalStateException("That student ID is already registered.");
@@ -71,57 +73,34 @@ public class UserService {
         user.setPassword(encoder.encode(req.password()));
         user.setName(req.name().trim());
         user.setRole(role);
+        user.setStatus(User.PENDING);
         user.setStudentId(studentId);
+        user.setCreatedAt(LocalDate.now());
         return users.save(user);
     }
 
-    // ---------- Update (name, email, student ID, optional new password) ----------
+    // ---------- Admin: approve, reject, delete ----------
 
-    public User update(Long id, UserRequest req) {
+    public User approve(Long id) {
+        return setStatus(id, User.APPROVED);
+    }
+
+    public User reject(Long id) {
+        return setStatus(id, User.REJECTED);
+    }
+
+    private User setStatus(Long id, String status) {
         User user = getById(id);
-
-        if (isBlank(req.name()) || isBlank(req.email())) {
-            throw new IllegalArgumentException("Name and email are required.");
+        if (user.getRole().equals(User.ADMIN)) {
+            throw new IllegalStateException("The admin account cannot be changed.");
         }
-
-        String email = req.email().trim();
-        Optional<User> sameEmail = users.findByEmailIgnoreCase(email);
-        if (sameEmail.isPresent() && !sameEmail.get().getId().equals(id)) {
-            throw new IllegalStateException("That email is already registered.");
-        }
-
-        if (user.getRole().equals("STUDENT")) {
-            if (isBlank(req.studentId())) {
-                throw new IllegalArgumentException("Student ID is required for students.");
-            }
-            String studentId = req.studentId().trim();
-            Optional<User> sameId = users.findByStudentId(studentId);
-            if (sameId.isPresent() && !sameId.get().getId().equals(id)) {
-                throw new IllegalStateException("That student ID is already registered.");
-            }
-            user.setStudentId(studentId);
-        }
-
-        if (!isBlank(req.password())) {
-            if (req.password().length() < 6) {
-                throw new IllegalArgumentException("Password must be at least 6 characters.");
-            }
-            user.setPassword(encoder.encode(req.password()));
-        }
-
-        user.setName(req.name().trim());
-        user.setEmail(email);
-        if (!user.getRole().equals("ADMIN")) {
-            user.setUsername(email.toLowerCase());   // the username follows the email
-        }
+        user.setStatus(status);
         return users.save(user);
     }
-
-    // ---------- Delete ----------
 
     public void delete(Long id) {
         User user = getById(id);
-        if (user.getRole().equals("ADMIN")) {
+        if (user.getRole().equals(User.ADMIN)) {
             throw new IllegalStateException("The admin account cannot be deleted.");
         }
         users.delete(user);
@@ -129,7 +108,8 @@ public class UserService {
 
     // ---------- Login and password reset ----------
 
-    // Accepts a username or an email
+    // Accepts a username or an email. Returns the user only if the password matches.
+    // The caller must still check user.getStatus() before letting the user in.
     public Optional<User> authenticate(String usernameOrEmail, String password) {
         if (isBlank(usernameOrEmail) || password == null) return Optional.empty();
         String key = usernameOrEmail.trim();
@@ -150,9 +130,25 @@ public class UserService {
         users.save(user);
     }
 
-    // ---------- Default admin (runs at startup) ----------
+    // ---------- Startup setup (runs every time the backend starts) ----------
+    // 1. Fixes accounts saved by the old version: TEACHER becomes STAFF,
+    //    and accounts with no status become APPROVED so they can still log in.
+    // 2. Creates the default admin if it does not exist yet.
 
-    public void ensureAdmin() {
+    public void prepareAccounts() {
+        for (User u : users.findAll()) {
+            boolean changed = false;
+            if ("TEACHER".equals(u.getRole())) {
+                u.setRole(User.STAFF);
+                changed = true;
+            }
+            if (isBlank(u.getStatus())) {
+                u.setStatus(User.APPROVED);
+                changed = true;
+            }
+            if (changed) users.save(u);
+        }
+
         if (users.existsByUsername("admin")) return;
 
         User admin = new User();
@@ -160,7 +156,9 @@ public class UserService {
         admin.setEmail("admin@school.edu");
         admin.setPassword(encoder.encode("admin123"));
         admin.setName("Administrator");
-        admin.setRole("ADMIN");
+        admin.setRole(User.ADMIN);
+        admin.setStatus(User.APPROVED);
+        admin.setCreatedAt(LocalDate.now());
         users.save(admin);
         System.out.println("Admin account created: admin / admin123");
     }

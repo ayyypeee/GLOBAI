@@ -55,12 +55,6 @@ export default function StudentDashboard({ user, onLogout }) {
 
   useEffect(() => {
     if (view !== 'attendance') return
-    if (!user.studentId) {
-      setAttendanceRecords([])
-      setAttendanceError('This demo account does not have a student ID.')
-      return
-    }
-
     setAttendanceLoading(true)
     setAttendanceError('')
     getStudentAttendance(user.studentId)
@@ -102,7 +96,7 @@ export default function StudentDashboard({ user, onLogout }) {
             <Table
               cols={attCols}
               rows={attendanceRecords}
-              empty="No attendance has been saved for this demo student yet."
+              empty="No attendance has been saved for you yet."
             />
           )}
         </>

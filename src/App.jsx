@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import './App.css'
-import { login, register, forgotPassword, resetPassword } from './api'
+import { login, requestAccount, forgotPassword, resetPassword } from './api'
 import StudentDashboard from './pages/StudentDashboard'
-import TeacherDashboard from './pages/TeacherDashboard'
+import StaffDashboard from './pages/StaffDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 
-const ROLES = ['Student', 'Teacher', 'Admin']
+const ROLES = ['Student', 'Staff']
 
 function StudentIcon() {
   return (
@@ -16,19 +16,11 @@ function StudentIcon() {
   )
 }
 
-function TeacherIcon() {
+function StaffIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z" />
       <path d="M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z" />
-    </svg>
-  )
-}
-
-function AdminIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" />
     </svg>
   )
 }
@@ -73,8 +65,7 @@ function EyeIcon({ open }) {
 function RoleTabs({ role, onChange, roles = ROLES }) {
   const icons = {
     Student: <StudentIcon />,
-    Teacher: <TeacherIcon />,
-    Admin: <AdminIcon />,
+    Staff: <StaffIcon />,
   }
 
   return (
@@ -259,7 +250,7 @@ function ResetPassword({ onBack }) {
   )
 }
 
-function Register({ onBack }) {
+function RequestAccount({ onBack }) {
   const [role, setRole] = useState('Student')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -279,7 +270,7 @@ function Register({ onBack }) {
     }
     setLoading(true)
     try {
-      await register({ password, name, email, role, studentId })
+      await requestAccount({ password, name, email, role, studentId })
       setDone(true)
     } catch (err) {
       setError(err.message)
@@ -291,12 +282,13 @@ function Register({ onBack }) {
   return (
     <div className="page">
       <div className="login-card">
-        <h1>REGISTER</h1>
+        <h1>CONTACT ADMIN</h1>
 
         {done ? (
           <>
             <p className="success-msg">
-              Account created! You can now log in with <strong>{email}</strong>.
+              Request sent! Once the admin approves <strong>{email}</strong>,
+              you can log in as {role}.
             </p>
             <button type="button" className="submit-btn" onClick={onBack}>
               Back to login
@@ -304,11 +296,15 @@ function Register({ onBack }) {
           </>
         ) : (
           <>
-            <RoleTabs role={role} onChange={setRole} roles={['Student', 'Teacher']} />
+            <p className="contact-note">
+              Accounts are created by the admin. Send your school email and the
+              password you want to use. You can log in after the admin approves your request.
+            </p>
+            <RoleTabs role={role} onChange={setRole} />
             <form onSubmit={handleSubmit}>
               <InputField label="Full name" icon={<UserIcon />} type="text"
                 value={name} placeholder="Enter your full name" onChange={setName} />
-              <InputField label="Email address" icon={<MailIcon />} type="email"
+              <InputField label="School email" icon={<MailIcon />} type="email"
                 value={email} placeholder="Enter your school email" onChange={setEmail} />
               {role === 'Student' && (
                 <InputField label="Student ID" icon={<UserIcon />} type="text"
@@ -322,11 +318,11 @@ function Register({ onBack }) {
               {error && <p className="error-msg">{error}</p>}
 
               <button type="submit" className="submit-btn" disabled={loading}>
-                {loading ? 'Creating account...' : `Register as ${role}`}
+                {loading ? 'Sending request...' : `Send request as ${role}`}
               </button>
 
               <p className="footer-text">
-                Already have an account?{' '}
+                Already have an approved account?{' '}
                 <a href="#" className="link" onClick={(e) => { e.preventDefault(); onBack() }}>
                   Back to login
                 </a>
@@ -359,7 +355,9 @@ function App() {
     setLoading(true)
     try {
       const result = await login(username, password)
-      if (result.role !== role.toUpperCase()) {
+      // The Staff tab is for teachers (STAFF) and for the admin (ADMIN)
+      const allowed = role === 'Student' ? ['STUDENT'] : ['STAFF', 'ADMIN']
+      if (!allowed.includes(result.role)) {
         throw new Error(`This is not a ${role.toLowerCase()} account`)
       }
       setUser(result)
@@ -379,8 +377,8 @@ function App() {
     if (user.role === 'ADMIN') {
       return <AdminDashboard user={user} onLogout={handleLogout} />
     }
-    return user.role === 'TEACHER' ? (
-      <TeacherDashboard user={user} onLogout={handleLogout} />
+    return user.role === 'STAFF' ? (
+      <StaffDashboard user={user} onLogout={handleLogout} />
     ) : (
       <StudentDashboard user={user} onLogout={handleLogout} />
     )
@@ -391,7 +389,7 @@ function App() {
   }
 
   if (view === 'register') {
-    return <Register onBack={() => setView('login')} />
+    return <RequestAccount onBack={() => setView('login')} />
   }
 
   if (view === 'reset') {
@@ -464,14 +462,14 @@ function App() {
           {error && <p className="error-msg">{error}</p>}
 
           <button type="submit" className="submit-btn" disabled={loading}>
-            {loading ? 'Logging in...' : `Login in as ${role}`}
+            {loading ? 'Logging in...' : `Login as ${role}`}
           </button>
         </form>
 
         <p className="footer-text">
           Don't have an account?{' '}
           <a href="#" className="link" onClick={(e) => { e.preventDefault(); setView('register') }}>
-            Register here
+            Contact admin to make an account
           </a>
         </p>
       </div>

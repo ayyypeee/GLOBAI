@@ -7,6 +7,8 @@ const ICONS = {
   concern: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
   announce: <><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z" /><path d="M16 8a5 5 0 0 1 0 8" /></>,
   users: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>,
+  shield: <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" />,
+  pending: <><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></>,
   bell: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></>,
   right: <path d="m9 18 6-6-6-6" />,
   down: <path d="m6 9 6 6 6-6" />,
@@ -35,6 +37,7 @@ export function Stats({ items }) {
   )
 }
 
+// A column can have render(row) to show buttons or custom content
 export function Table({ cols, rows, empty = 'Nothing here yet.' }) {
   if (!rows || rows.length === 0) return <p className="empty">{empty}</p>
   return (
@@ -48,7 +51,9 @@ export function Table({ cols, rows, empty = 'Nothing here yet.' }) {
             <tr key={i}>
               {cols.map((c) => (
                 <td key={c.key}>
-                  {c.key === 'status'
+                  {c.render
+                    ? c.render(r)
+                    : c.key === 'status'
                     ? <span className={'pill ' + String(r.status).toLowerCase().replace(/\s/g, '-')}>{r.status}</span>
                     : r[c.key]}
                 </td>

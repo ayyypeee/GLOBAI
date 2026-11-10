@@ -1,8 +1,9 @@
-package com.academiko.academiko;
+package com.csit321G5.Globai;
 
 import java.time.Instant;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,16 +34,28 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest req) {
-        return service.authenticate(req.username(), req.password())
-                .map(user -> ResponseEntity.ok(UserResponse.from(user)))
-                .orElse(ResponseEntity.status(401).build());
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+        Optional<User> found = service.authenticate(req.username(), req.password());
+        if (found.isEmpty()) {
+            return ResponseEntity.status(401).body("Invalid email or password.");
+        }
+
+        // The password is correct, now check that the admin approved the account
+        User user = found.get();
+        if (User.PENDING.equals(user.getStatus())) {
+            return ResponseEntity.status(403).body("Your account is still waiting for admin approval.");
+        }
+        if (User.REJECTED.equals(user.getStatus())) {
+            return ResponseEntity.status(403).body("Your account request was rejected. Please contact the admin.");
+        }
+        return ResponseEntity.ok(UserResponse.from(user));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRequest req) {
+    // A student or staff member asks the admin for an account (saved as PENDING)
+    @PostMapping("/request-account")
+    public ResponseEntity<?> requestAccount(@RequestBody UserRequest req) {
         try {
-            return ResponseEntity.status(201).body(UserResponse.from(service.create(req)));
+            return ResponseEntity.status(201).body(UserResponse.from(service.requestAccount(req)));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(409).body(e.getMessage());
         } catch (IllegalArgumentException e) {

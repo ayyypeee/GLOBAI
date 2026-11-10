@@ -1,4 +1,4 @@
-package com.academiko.academiko;
+package com.csit321G5.Globai;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +9,7 @@ public class DataSeeder {
 
     // Runs once every time the backend starts
     @Bean
-    CommandLineRunner seedAdmin(UserService userService) {
-        return args -> userService.ensureAdmin();
+    CommandLineRunner prepareAccounts(UserService userService) {
+        return args -> userService.prepareAccounts();
     }
 }

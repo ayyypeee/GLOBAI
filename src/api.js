@@ -25,11 +25,12 @@ export async function login(username, password) {
   return res.json()
 }
 
-export async function register(data) {
+// A student or staff member asks the admin for an account (saved as pending)
+export async function requestAccount(data) {
   const res = await send(
-    '/api/auth/register',
+    '/api/auth/request-account',
     { method: 'POST', headers: JSON_HEADERS, body: JSON.stringify(data) },
-    'Could not create account'
+    'Could not send your account request'
   )
   return res.json()
 }
@@ -59,33 +60,25 @@ export async function getStudentAttendance(studentId) {
   return res.json()
 }
 
-// ---------- Admin: user CRUD ----------
+// ---------- Admin: accounts ----------
 
 export async function listUsers() {
-  const res = await send('/api/users', {}, 'Could not load users')
+  const res = await send('/api/users', {}, 'Could not load accounts')
   return res.json()
 }
 
-export async function createUser(data) {
-  const res = await send(
-    '/api/users',
-    { method: 'POST', headers: JSON_HEADERS, body: JSON.stringify(data) },
-    'Could not create user'
-  )
+export async function approveUser(id) {
+  const res = await send(`/api/users/${id}/approve`, { method: 'PUT' }, 'Could not approve account')
   return res.json()
 }
 
-export async function updateUser(id, data) {
-  const res = await send(
-    `/api/users/${id}`,
-    { method: 'PUT', headers: JSON_HEADERS, body: JSON.stringify(data) },
-    'Could not update user'
-  )
+export async function rejectUser(id) {
+  const res = await send(`/api/users/${id}/reject`, { method: 'PUT' }, 'Could not reject account')
   return res.json()
 }
 
 export async function deleteUser(id) {
-  await send(`/api/users/${id}`, { method: 'DELETE' }, 'Could not delete user')
+  await send(`/api/users/${id}`, { method: 'DELETE' }, 'Could not delete account')
 }
 
 // ---------- Password reset ----------
