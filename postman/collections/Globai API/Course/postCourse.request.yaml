@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/course/api/postCourse"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "coursecode": "IT365",
+      "title": "Data Analytics 1",
+      "units": 3,
+      "teacher": {
+        "teacherid": 1
+      }
+    }
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/student/api/putStudent/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "program": "BSIT",
+      "yearlevel": 4
+    }
+order: 3000

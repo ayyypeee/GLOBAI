@@ -3,7 +3,6 @@ package com.csit321G5.Globai.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,47 +17,32 @@ import com.csit321G5.Globai.entity.UserEntity;
 import com.csit321G5.Globai.service.UserService;
 
 @RestController
-@CrossOrigin(origins = { "http://localhost:5173", "http://127.0.0.1:5173" }) // lets the React frontend call this API
 @RequestMapping("/user/api")
 public class UserController {
 
     @Autowired
     UserService userv;
 
-    public UserController() {
-        // TODO Auto-generated constructor stub
-    }
-
-    @GetMapping("/printAuthor")
-    public String printAuthor() {
-        return "Villanueva, Monterroyo, Arañas";
-    }
-
-    // C - Create (Register)
     @PostMapping("/postNewUser")
     public UserEntity postUser(@RequestBody UserEntity user) {
         return userv.postUser(user);
     }
 
-    // Login (send username and password in the body)
     @PostMapping("/login")
     public UserEntity login(@RequestBody UserEntity user) {
         return userv.login(user.getUsername(), user.getPassword());
     }
 
-    // R - Read
     @GetMapping("/getAllUsers")
     public List<UserEntity> getAllUsers() {
         return userv.getAllUsers();
     }
 
-    // U - Update
     @PutMapping("/putUserEmail")
     public UserEntity putUserEmail(@RequestParam int id, @RequestBody UserEntity newUserEmail) {
         return userv.putUserEmail(id, newUserEmail);
     }
 
-    // D - Delete
     @DeleteMapping("/deleteUser/{id}")
     public String deleteUser(@PathVariable int id) {
         return userv.deleteUser(id);

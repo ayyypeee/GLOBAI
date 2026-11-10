@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/course/api/deleteCourse/IT365"
+method: DELETE
+order: 4000

@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/user/api/putUserEmail?id=1"
+method: PUT
+headers:
+  Content-Type: application/json
+queryParams:
+  id: "1"
+body:
+  type: json
+  content: |-
+    {
+      "email": "new@gmail.com"
+    }
+order: 5000

@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/teacher/api/postTeacher"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "user": {
+        "userid": 1
+      },
+      "department": "IT"
+    }
+order: 1000

@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/course/api/putCourse/IT365"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Data Analytics 1",
+      "units": 4,
+      "teacher": {
+        "teacherid": 1
+      }
+    }
+order: 3000

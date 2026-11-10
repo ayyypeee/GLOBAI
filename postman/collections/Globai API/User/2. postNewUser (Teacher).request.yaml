@@ -10,7 +10,7 @@ body:
       "username": "teacher1",
       "password": "123456",
       "role": "TEACHER",
-      "fullname": "Maria Santos",
-      "email": "maria@gmail.com"
+      "fullname": "Cyberg Monterroyo",
+      "email": "cyberg@gmail.com"
     }
-order: 3000
+order: 2000

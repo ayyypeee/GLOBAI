@@ -1,14 +1,12 @@
 $kind: http-request
-url: "{{baseUrl}}/user/api/putUserEmail?id=1"
+url: "{{baseUrl}}/teacher/api/putTeacher/1"
 method: PUT
 headers:
   Content-Type: application/json
-queryParams:
-  id: "1"
 body:
   type: json
   content: |-
     {
-      "email": "juan.new@gmail.com"
+      "department": "Computer Science"
     }
-order: 6000
+order: 3000

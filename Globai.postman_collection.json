@@ -2,203 +2,618 @@
   "info": {
     "name": "Globai API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Run the backend first (port 8080), then run the requests in order 1 to 7."
+    "description": "Run the backend first (port 8080). Order: User, Teacher, Student, Course, Enrollment."
   },
-  "item": [
-    {
-      "name": "1. printAuthor",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/user/api/printAuthor",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "user",
-            "api",
-            "printAuthor"
-          ]
-        }
-      }
-    },
-    {
-      "name": "2. postNewUser (Student)",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/user/api/postNewUser",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "user",
-            "api",
-            "postNewUser"
-          ]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"username\": \"student1\",\n  \"password\": \"123456\",\n  \"role\": \"STUDENT\",\n  \"fullname\": \"Juan Dela Cruz\",\n  \"email\": \"juan@gmail.com\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "3. postNewUser (Teacher)",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/user/api/postNewUser",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "user",
-            "api",
-            "postNewUser"
-          ]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"username\": \"teacher1\",\n  \"password\": \"123456\",\n  \"role\": \"TEACHER\",\n  \"fullname\": \"Maria Santos\",\n  \"email\": \"maria@gmail.com\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "4. login",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/user/api/login",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "user",
-            "api",
-            "login"
-          ]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"username\": \"student1\",\n  \"password\": \"123456\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "5. getAllUsers",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/user/api/getAllUsers",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "user",
-            "api",
-            "getAllUsers"
-          ]
-        }
-      }
-    },
-    {
-      "name": "6. putUserEmail",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/user/api/putUserEmail?id=1",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "user",
-            "api",
-            "putUserEmail"
-          ],
-          "query": [
-            {
-              "key": "id",
-              "value": "1"
-            }
-          ]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"email\": \"juan.new@gmail.com\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "7. deleteUser",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/user/api/deleteUser/1",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "user",
-            "api",
-            "deleteUser",
-            "1"
-          ]
-        }
-      }
-    }
-  ],
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "1. postNewUser (Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/api/postNewUser",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "api",
+                "postNewUser"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"student1\",\n  \"password\": \"123456\",\n  \"role\": \"STUDENT\",\n  \"fullname\": \"Juan Dela Cruz\",\n  \"email\": \"juan@gmail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "2. postNewUser (Teacher)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/api/postNewUser",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "api",
+                "postNewUser"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teacher1\",\n  \"password\": \"123456\",\n  \"role\": \"TEACHER\",\n  \"fullname\": \"Cyberg Monterroyo\",\n  \"email\": \"cyberg@gmail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "3. login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "api",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"student1\",\n  \"password\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "4. getAllUsers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/api/getAllUsers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "api",
+                "getAllUsers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. putUserEmail",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/api/putUserEmail?id=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "api",
+                "putUserEmail"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"new@gmail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "6. deleteUser",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/api/deleteUser/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "api",
+                "deleteUser",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teacher",
+      "item": [
+        {
+          "name": "postTeacher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teacher/api/postTeacher",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teacher",
+                "api",
+                "postTeacher"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"userid\": 1\n  },\n  \"department\": \"IT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "getAllTeachers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teacher/api/getAllTeachers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teacher",
+                "api",
+                "getAllTeachers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "putTeacher",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teacher/api/putTeacher/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teacher",
+                "api",
+                "putTeacher",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"department\": \"Computer Science\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "deleteTeacher",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teacher/api/deleteTeacher/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teacher",
+                "api",
+                "deleteTeacher",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student",
+      "item": [
+        {
+          "name": "postStudent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student/api/postStudent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "student",
+                "api",
+                "postStudent"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"userid\": 2\n  },\n  \"program\": \"BSIT\",\n  \"yearlevel\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "getAllStudents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/student/api/getAllStudents",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "student",
+                "api",
+                "getAllStudents"
+              ]
+            }
+          }
+        },
+        {
+          "name": "putStudent",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student/api/putStudent/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "student",
+                "api",
+                "putStudent",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"program\": \"BSIT\",\n  \"yearlevel\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "deleteStudent",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/student/api/deleteStudent/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "student",
+                "api",
+                "deleteStudent",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Course",
+      "item": [
+        {
+          "name": "postCourse",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/course/api/postCourse",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "course",
+                "api",
+                "postCourse"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"coursecode\": \"IT365\",\n  \"title\": \"Data Analytics 1\",\n  \"units\": 3,\n  \"teacher\": {\n    \"teacherid\": 1\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "getAllCourses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/course/api/getAllCourses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "course",
+                "api",
+                "getAllCourses"
+              ]
+            }
+          }
+        },
+        {
+          "name": "putCourse",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/course/api/putCourse/IT365",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "course",
+                "api",
+                "putCourse",
+                "IT365"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Data Analytics 1\",\n  \"units\": 4,\n  \"teacher\": {\n    \"teacherid\": 1\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "deleteCourse",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/course/api/deleteCourse/IT365",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "course",
+                "api",
+                "deleteCourse",
+                "IT365"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enrollment",
+      "item": [
+        {
+          "name": "postEnrollment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enrollment/api/postEnrollment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollment",
+                "api",
+                "postEnrollment"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student\": {\n    \"studentid\": 1\n  },\n  \"course\": {\n    \"coursecode\": \"IT365\"\n  },\n  \"dateenrolled\": \"2026-11-11\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "getAllEnrollments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enrollment/api/getAllEnrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollment",
+                "api",
+                "getAllEnrollments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "putEnrollment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enrollment/api/putEnrollment/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollment",
+                "api",
+                "putEnrollment",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student\": {\n    \"studentid\": 1\n  },\n  \"course\": {\n    \"coursecode\": \"IT365\"\n  },\n  \"dateenrolled\": \"2026-11-12\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "deleteEnrollment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enrollment/api/deleteEnrollment/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollment",
+                "api",
+                "deleteEnrollment",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

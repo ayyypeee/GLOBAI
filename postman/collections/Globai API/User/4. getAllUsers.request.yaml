@@ -1,4 +1,4 @@
 $kind: http-request
 url: "{{baseUrl}}/user/api/getAllUsers"
 method: GET
-order: 5000
+order: 4000
