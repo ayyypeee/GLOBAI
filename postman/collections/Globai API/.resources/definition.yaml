@@ -1,0 +1,4 @@
+$kind: collection
+description: Run the backend first (port 8080), then run the requests in order 1 to 7.
+variables:
+  baseUrl: http://localhost:8080

@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "Globai API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run the backend first (port 8080), then run the requests in order 1 to 7."
+  },
+  "item": [
+    {
+      "name": "1. printAuthor",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/user/api/printAuthor",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "user",
+            "api",
+            "printAuthor"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. postNewUser (Student)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/user/api/postNewUser",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "user",
+            "api",
+            "postNewUser"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"student1\",\n  \"password\": \"123456\",\n  \"role\": \"STUDENT\",\n  \"fullname\": \"Juan Dela Cruz\",\n  \"email\": \"juan@gmail.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "3. postNewUser (Teacher)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/user/api/postNewUser",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "user",
+            "api",
+            "postNewUser"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"teacher1\",\n  \"password\": \"123456\",\n  \"role\": \"TEACHER\",\n  \"fullname\": \"Maria Santos\",\n  \"email\": \"maria@gmail.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "4. login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/user/api/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "user",
+            "api",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"student1\",\n  \"password\": \"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "5. getAllUsers",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/user/api/getAllUsers",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "user",
+            "api",
+            "getAllUsers"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. putUserEmail",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/user/api/putUserEmail?id=1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "user",
+            "api",
+            "putUserEmail"
+          ],
+          "query": [
+            {
+              "key": "id",
+              "value": "1"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"juan.new@gmail.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "7. deleteUser",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/user/api/deleteUser/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "user",
+            "api",
+            "deleteUser",
+            "1"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ]
+}

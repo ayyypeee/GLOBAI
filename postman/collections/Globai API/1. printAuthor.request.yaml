@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/user/api/printAuthor"
+method: GET
+order: 1000

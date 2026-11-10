@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/user/api/postNewUser"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "teacher1",
+      "password": "123456",
+      "role": "TEACHER",
+      "fullname": "Maria Santos",
+      "email": "maria@gmail.com"
+    }
+order: 3000

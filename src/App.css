@@ -109,16 +109,6 @@
   padding: 0;
 }
 
-.remember {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  color: #374151;
-  cursor: pointer;
-}
-
 .submit-btn {
   width: 100%;
   height: 48px;
@@ -151,21 +141,6 @@
   text-decoration: underline;
 }
 
-.link.small {
-  font-size: 13px;
-}
-.password-group {
-  margin-bottom: 18px;
-}
-
-.password-group .field {
-  margin-bottom: 8px;
-}
-
-.forgot-link {
-  display: block;
-  text-align: right;
-}
 .success-msg {
   margin: 0 0 20px;
   padding: 12px 14px;
@@ -188,11 +163,4 @@
 .submit-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-}
-
-.contact-note {
-  margin: 0 0 20px;
-  color: #4b5563;
-  font-size: 14px;
-  line-height: 1.5;
 }
