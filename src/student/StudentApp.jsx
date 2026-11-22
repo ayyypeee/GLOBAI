@@ -127,7 +127,7 @@ function StudentApp({ user, onLogout }) {
         <div className="sp-brand">
           <span className="sp-brand-mark">G</span>
           <div>
-            GLOBAI
+            Student
             <small>Student Portal</small>
           </div>
         </div>

@@ -156,7 +156,7 @@ function TeacherApp({ user, onLogout }) {
         <div className="tp-brand">
           <span className="tp-brand-mark">G</span>
           <div>
-            GLOBAI
+            Teacher
             <small>Teacher Portal</small>
           </div>
         </div>
