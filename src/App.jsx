@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
 import StudentApp from './student/StudentApp'
+import TeacherApp from './teacher/TeacherApp'
 
 function App() {
   const [view, setView] = useState('login') // 'login' or 'register'
@@ -13,6 +14,7 @@ function App() {
   // after login
   if (user) {
     if (user.role === 'STUDENT') return <StudentApp user={user} onLogout={() => setUser(null)} />
+    if (user.role === 'TEACHER') return <TeacherApp user={user} onLogout={() => setUser(null)} />
     return <Home user={user} onLogout={() => setUser(null)} />
   }
 
