@@ -1,278 +1,288 @@
-import {
-  dashboardStats,
-  classPerformance,
-  attendanceTrend,
-  studentsAtRisk,
-  recentActivity,
-} from '../mockData';
+import { stats, classPerformance, attendanceTrend, atRisk, activity } from '../mockData'
 
-function ClassPerformanceChart({ data }) {
-  const width = 520;
-  const height = 240;
-  const padding = { top: 20, right: 20, bottom: 56, left: 40 };
-  const chartW = width - padding.left - padding.right;
-  const chartH = height - padding.top - padding.bottom;
-  const maxY = 100;
-  const barGap = 18;
-  const barWidth = data.length > 0 ? (chartW - barGap * (data.length - 1)) / data.length : chartW;
-
-  return (
-    <div className="tp-chart-wrap">
-      <svg
-        className="tp-chart"
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label="Class performance bar chart"
-      >
-        {[0, 25, 50, 75, 100].map((tick) => {
-          const y = padding.top + chartH - (tick / maxY) * chartH;
-          return (
-            <g key={tick}>
-              <line
-                x1={padding.left}
-                y1={y}
-                x2={width - padding.right}
-                y2={y}
-                stroke="#e2e8f0"
-                strokeWidth="1"
-              />
-              <text x={padding.left - 8} y={y + 4} textAnchor="end" fontSize="11" fill="#64748b">
-                {tick}
-              </text>
-            </g>
-          );
-        })}
-        {data.map((item, index) => {
-          const x = padding.left + index * (barWidth + barGap);
-          const barH = (item.average / maxY) * chartH;
-          const y = padding.top + chartH - barH;
-          return (
-            <g key={item.subject}>
-              <rect x={x} y={y} width={barWidth} height={barH} rx="8" fill="#3B82F6" />
-              <text
-                x={x + barWidth / 2}
-                y={y - 8}
-                textAnchor="middle"
-                fontSize="12"
-                fontWeight="600"
-                fill="#1E3A8A"
-              >
-                {item.average}%
-              </text>
-              <text
-                x={x + barWidth / 2}
-                y={height - 28}
-                textAnchor="middle"
-                fontSize="11"
-                fill="#334155"
-              >
-                {item.subject}
-              </text>
-              <text
-                x={x + barWidth / 2}
-                y={height - 12}
-                textAnchor="middle"
-                fontSize="10"
-                fill="#64748b"
-              >
-                {item.students} students
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-    </div>
-  );
-}
-
-function AttendanceTrendChart({ data }) {
-  const width = 520;
-  const height = 240;
-  const padding = { top: 20, right: 20, bottom: 40, left: 40 };
-  const chartW = width - padding.left - padding.right;
-  const chartH = height - padding.top - padding.bottom;
-  const minY = 80;
-  const maxY = 100;
-  const stepX = data.length > 1 ? chartW / (data.length - 1) : chartW;
-
-  const points = data.map((d, i) => {
-    const x = padding.left + i * stepX;
-    const y = padding.top + chartH - ((d.rate - minY) / (maxY - minY)) * chartH;
-    return { x, y, ...d };
-  });
-  const line = points.map((p) => `${p.x},${p.y}`).join(' ');
-  const area = `${points[0]?.x ?? padding.left},${padding.top + chartH} ${line} ${
-    points[points.length - 1]?.x ?? padding.left + chartW
-  },${padding.top + chartH}`;
-
-  return (
-    <div className="tp-chart-wrap">
-      <svg
-        className="tp-chart"
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label="Attendance trend line chart"
-      >
-        {[80, 85, 90, 95, 100].map((tick) => {
-          const y = padding.top + chartH - ((tick - minY) / (maxY - minY)) * chartH;
-          return (
-            <g key={tick}>
-              <line
-                x1={padding.left}
-                y1={y}
-                x2={width - padding.right}
-                y2={y}
-                stroke="#e2e8f0"
-                strokeWidth="1"
-              />
-              <text x={padding.left - 8} y={y + 4} textAnchor="end" fontSize="11" fill="#64748b">
-                {tick}
-              </text>
-            </g>
-          );
-        })}
-        <polygon points={area} fill="rgba(59,130,246,0.12)" />
-        <polyline
-          points={line}
-          fill="none"
-          stroke="#3B82F6"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {points.map((p) => (
-          <g key={p.label}>
-            <circle cx={p.x} cy={p.y} r="4.5" fill="#1E3A8A" stroke="#ffffff" strokeWidth="2" />
-            <text x={p.x} y={height - 14} textAnchor="middle" fontSize="11" fill="#64748b">
-              {p.label}
-            </text>
-            <text
-              x={p.x}
-              y={p.y - 10}
-              textAnchor="middle"
-              fontSize="11"
-              fill="#1E3A8A"
-              fontWeight="600"
-            >
-              {p.rate}%
-            </text>
-          </g>
-        ))}
-      </svg>
-    </div>
-  );
-}
-
-function statusPillClass(status) {
-  if (status === 'good') return 'good';
-  if (status === 'pending' || status === 'late') return 'pending';
-  return 'failed';
-}
-
-function Dashboard({ user }) {
-  const displayName = user?.fullname || user?.name || user?.username || 'Teacher';
-  const firstName = displayName.split(' ')[0] || 'Teacher';
-
-  return (
+const STAT_ICONS = {
+  users: (
     <>
-      <div>
-        <h1 className="tp-page-title">Welcome back, {firstName}!</h1>
-        <p className="tp-page-subtitle">Monitor your classes, attendance, and student concerns at a glance.</p>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+    </>
+  ),
+  trend: (
+    <>
+      <path d="m3 17 6-6 4 4 8-8" />
+      <path d="M14 7h7v7" />
+    </>
+  ),
+  check: (
+    <>
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18m-12 6 2 2 4-4" />
+    </>
+  ),
+  alert: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 8v4M12 16h.01" />
+    </>
+  ),
+}
+
+function StatIcon({ name }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {STAT_ICONS[name]}
+    </svg>
+  )
+}
+
+function badgeClass(label) {
+  switch (label) {
+    case 'Good standing':
+    case 'On target':
+    case 'Done':
+      return 'tp-badge tp-badge-green'
+    case 'Low grade':
+    case 'Frequent absences':
+      return 'tp-badge tp-badge-red'
+    case 'Needs support':
+    case 'Near failing':
+    case 'Pending':
+    case 'Late':
+    case 'Awaiting review':
+      return 'tp-badge tp-badge-amber'
+    default:
+      return 'tp-badge tp-badge-gray'
+  }
+}
+
+function initialsOf(name) {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('')
+}
+
+function BarChart({ data }) {
+  const ticks = [100, 75, 50, 25, 0]
+  const cols = { gridTemplateColumns: `repeat(${data.length}, 1fr)` }
+
+  return (
+    <div className="tp-chart tp-chart-bars">
+      <div className="tp-chart-y">
+        {ticks.map((t, i) => (
+          <span key={t} style={{ top: `${i * 25}%` }}>
+            {t}
+          </span>
+        ))}
       </div>
 
-      <div className="tp-grid tp-stats-grid">
-        <section className="tp-card tp-stat-card" aria-label="Total students">
-          <span className="tp-stat-label">Total Students</span>
-          <span className="tp-stat-value">{dashboardStats.totalStudents}</span>
-          <span className="tp-stat-note">Across all active classes</span>
-        </section>
-        <section className="tp-card tp-stat-card" aria-label="Class average">
-          <span className="tp-stat-label">Class Average</span>
-          <span className="tp-stat-value">{dashboardStats.classAverage}%</span>
-          <span className="tp-stat-note">
-            <span className="tp-pill good">Good standing</span>
+      <div className="tp-chart-plot">
+        {ticks.map((t, i) => (
+          <div key={t} className="tp-chart-grid" style={{ top: `${i * 25}%` }} />
+        ))}
+        <div className="tp-bar-cols" style={cols}>
+          {data.map((d) => (
+            <div key={d.name} className="tp-bar-col">
+              <div className="tp-bar" style={{ height: `${d.average}%` }}>
+                <span className="tp-bar-value">{d.average}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="tp-chart-x tp-chart-x-bars" style={cols}>
+        {data.map((d) => (
+          <div key={d.name}>
+            <strong>{d.name}</strong>
+            <span>{d.students} students</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function LineChart({ data, min, max, ticks, suffix = '' }) {
+  const pts = data.map((d, i) => ({
+    ...d,
+    x: ((i + 0.5) / data.length) * 100,
+    y: 100 - ((d.value - min) / (max - min)) * 100,
+  }))
+  const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ')
+  const area = `${line} L${pts[pts.length - 1].x},100 L${pts[0].x},100 Z`
+  const step = 100 / (ticks.length - 1)
+
+  return (
+    <div className="tp-chart">
+      <div className="tp-chart-y">
+        {ticks.map((t, i) => (
+          <span key={t} style={{ top: `${i * step}%` }}>
+            {t}
           </span>
-        </section>
-        <section className="tp-card tp-stat-card" aria-label="Attendance rate">
-          <span className="tp-stat-label">Attendance Rate</span>
-          <span className="tp-stat-value">{dashboardStats.attendanceRate}%</span>
-          <span className="tp-stat-note">
-            <span className={`tp-pill ${dashboardStats.attendanceRate >= 90 ? 'good' : 'pending'}`}>
-              {dashboardStats.attendanceRate >= 90 ? 'On target' : 'Needs attention'}
+        ))}
+      </div>
+
+      <div className="tp-chart-plot">
+        {ticks.map((t, i) => (
+          <div key={t} className="tp-chart-grid" style={{ top: `${i * step}%` }} />
+        ))}
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="tpAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={area} fill="url(#tpAreaGrad)" />
+          <path d={line} className="tp-chart-line" vectorEffect="non-scaling-stroke" />
+        </svg>
+        {pts.map((p) => (
+          <div key={p.label} className="tp-chart-dot" style={{ left: `${p.x}%`, top: `${p.y}%` }}>
+            <span>
+              {p.value}
+              {suffix}
             </span>
-          </span>
-        </section>
-        <section className="tp-card tp-stat-card" aria-label="Pending concerns">
-          <span className="tp-stat-label">Pending Concerns</span>
-          <span className="tp-stat-value">{dashboardStats.pendingConcerns}</span>
-          <span className="tp-stat-note">
-            <span className="tp-pill pending">Awaiting review</span>
-          </span>
-        </section>
+          </div>
+        ))}
       </div>
 
-      <div className="tp-grid tp-grid-two">
-        <section className="tp-card" aria-label="Class performance">
-          <div className="tp-card-header">
+      <div className="tp-chart-x" style={{ gridTemplateColumns: `repeat(${data.length}, 1fr)` }}>
+        {data.map((d) => (
+          <span key={d.label}>{d.label}</span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function Dashboard({ user, onNavigate }) {
+  const fullName = user?.fullname || user?.username || 'Teacher'
+  const firstName = fullName.split(' ')[0]
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  return (
+    <div className="tp-page">
+      {/* Hero */}
+      <section className="tp-hero">
+        <div>
+          <span className="tp-hero-date">{today}</span>
+          <h1 className="tp-hero-title">Welcome back, {firstName}!</h1>
+          <p className="tp-hero-sub">Monitor your classes, attendance, and student concerns at a glance.</p>
+        </div>
+        <div className="tp-hero-actions">
+          <button type="button" className="tp-btn tp-btn-light" onClick={() => onNavigate('attendance')}>
+            Take attendance
+          </button>
+          <button type="button" className="tp-btn tp-btn-ghost" onClick={() => onNavigate('gradebook')}>
+            Open gradebook
+          </button>
+        </div>
+      </section>
+
+      {/* Stat cards */}
+      <section className="tp-stats">
+        {stats.map((s) => (
+          <article key={s.key} className="tp-card tp-stat">
+            <span className={`tp-stat-icon tp-tone-${s.tone}`}>
+              <StatIcon name={s.icon} />
+            </span>
+            <div className="tp-stat-body">
+              <span className="tp-stat-label">{s.label}</span>
+              <strong className="tp-stat-value">{s.value}</strong>
+              <span className={badgeClass(s.note)}>{s.note}</span>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      {/* Charts */}
+      <section className="tp-two">
+        <article className="tp-card">
+          <div className="tp-card-head">
             <h2 className="tp-card-title">Class Performance</h2>
             <span className="tp-muted">Average by subject</span>
           </div>
-          <ClassPerformanceChart data={classPerformance} />
-        </section>
+          <BarChart data={classPerformance} />
+        </article>
 
-        <section className="tp-card" aria-label="Attendance trend">
-          <div className="tp-card-header">
+        <article className="tp-card">
+          <div className="tp-card-head">
             <h2 className="tp-card-title">Attendance Trend</h2>
             <span className="tp-muted">Weekly attendance rate</span>
           </div>
-          <AttendanceTrendChart data={attendanceTrend} />
-        </section>
-      </div>
+          <LineChart data={attendanceTrend} min={80} max={100} ticks={[100, 95, 90, 85, 80]} suffix="%" />
+        </article>
+      </section>
 
-      <div className="tp-grid tp-grid-two">
-        <section className="tp-card" aria-label="Students at risk">
-          <div className="tp-card-header">
+      {/* Risk + activity */}
+      <section className="tp-two">
+        <article className="tp-card">
+          <div className="tp-card-head">
             <h2 className="tp-card-title">Students at Risk</h2>
-            <span className="tp-pill failed">{studentsAtRisk.length} flagged</span>
+            <span className="tp-badge tp-badge-red">{atRisk.length} flagged</span>
           </div>
-          <ul className="tp-list">
-            {studentsAtRisk.map((student) => (
-              <li key={student.id} className="tp-list-item">
-                <div className="tp-item-main">
-                  <span className="tp-item-title">{student.name}</span>
-                  <span className="tp-item-meta">{student.subject}</span>
-                  <span className="tp-item-meta">
-                    Grade: {student.grade}% · Attendance: {student.attendance}%
-                  </span>
+          <div className="tp-list">
+            {atRisk.map((s) => (
+              <div key={s.id} className="tp-risk">
+                <span className="tp-risk-avatar">{initialsOf(s.name)}</span>
+                <div className="tp-risk-body">
+                  <strong className="tp-row-title">{s.name}</strong>
+                  <span className="tp-row-sub">{s.subject}</span>
+                  <div className="tp-chips">
+                    <span className={s.grade < 75 ? 'tp-chip tp-chip-red' : 'tp-chip'}>Grade {s.grade}%</span>
+                    <span className={s.attendance < 85 ? 'tp-chip tp-chip-red' : 'tp-chip'}>
+                      Attendance {s.attendance}%
+                    </span>
+                  </div>
                 </div>
-                <span className={`tp-pill ${statusPillClass(student.status)}`}>{student.issue}</span>
-              </li>
+                <span className={badgeClass(s.flag)}>{s.flag}</span>
+              </div>
             ))}
-          </ul>
-        </section>
+          </div>
+        </article>
 
-        <section className="tp-card" aria-label="Recent activity">
-          <div className="tp-card-header">
+        <article className="tp-card">
+          <div className="tp-card-head">
             <h2 className="tp-card-title">Recent Activity</h2>
+            <button type="button" className="tp-link" onClick={() => onNavigate('concerns')}>
+              View concerns
+            </button>
           </div>
-          <ul className="tp-list">
-            {recentActivity.map((item) => (
-              <li key={item.id} className="tp-list-item">
-                <div className="tp-item-main">
-                  <span className="tp-item-title">{item.title}</span>
-                  <span className="tp-item-meta">{item.detail}</span>
-                  <span className="tp-item-meta">{item.time}</span>
+          <div className="tp-timeline">
+            {activity.map((a) => (
+              <div key={a.id} className="tp-event">
+                <span className={`tp-event-dot tp-dot-${a.status.toLowerCase()}`} />
+                <div className="tp-event-body">
+                  <strong className="tp-row-title">{a.title}</strong>
+                  <span className="tp-row-sub">{a.text}</span>
+                  <span className="tp-row-time">{a.time}</span>
                 </div>
-                <span className={`tp-pill ${statusPillClass(item.status)}`}>
-                  {item.status === 'good' ? 'Done' : item.status === 'late' ? 'Late' : 'Pending'}
-                </span>
-              </li>
+                <span className={badgeClass(a.status)}>{a.status}</span>
+              </div>
             ))}
-          </ul>
-        </section>
-      </div>
-    </>
-  );
+          </div>
+        </article>
+      </section>
+    </div>
+  )
 }
 
-export default Dashboard;
+export default Dashboard

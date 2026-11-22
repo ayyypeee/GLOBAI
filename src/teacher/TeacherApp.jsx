@@ -1,261 +1,227 @@
-import { useMemo, useState } from 'react';
-import Dashboard from './pages/Dashboard';
-import Home from '../pages/Home';
-import { notifications, teacherProfile } from './mockData';
-import './teacher.css';
+import { useState } from 'react'
+import './teacher.css'
+import Dashboard from './pages/Dashboard'
+import Home from '../pages/Home'
+import { notificationCount } from './mockData'
 
-const NAV_ITEMS = [
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'classes', label: 'Classes' },
-  { key: 'gradebook', label: 'Gradebook' },
-  { key: 'attendance', label: 'Attendance' },
-  { key: 'quizzes', label: 'Quiz Manager' },
-  { key: 'concerns', label: 'Grade Concerns' },
-  { key: 'reports', label: 'Reports' },
-  { key: 'manage-records', label: 'Manage Records' },
-];
-
-function Icon({ name }) {
-  const common = {
-    width: 18,
-    height: 18,
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: '2',
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
-    'aria-hidden': 'true',
-  };
-  switch (name) {
-    case 'dashboard':
-      return (
-        <svg {...common}>
-          <rect x="3" y="3" width="8" height="8" rx="2" />
-          <rect x="13" y="3" width="8" height="5" rx="2" />
-          <rect x="13" y="10" width="8" height="11" rx="2" />
-          <rect x="3" y="13" width="8" height="8" rx="2" />
-        </svg>
-      );
-    case 'classes':
-      return (
-        <svg {...common}>
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-        </svg>
-      );
-    case 'gradebook':
-      return (
-        <svg {...common}>
-          <path d="M3 4h18v16H3z" />
-          <path d="M7 8h10M7 12h6M7 16h8" />
-        </svg>
-      );
-    case 'attendance':
-      return (
-        <svg {...common}>
-          <rect x="3" y="4" width="18" height="17" rx="2" />
-          <path d="M8 2v4M16 2v4M3 10h18" />
-          <path d="m9 16 2 2 4-4" />
-        </svg>
-      );
-    case 'quizzes':
-      return (
-        <svg {...common}>
-          <path d="M14 2H6a2 2 0 0 0-2 2v16l4-2 4 2 4-2 4 2V8z" />
-          <path d="M14 2v6h6" />
-        </svg>
-      );
-    case 'concerns':
-      return (
-        <svg {...common}>
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 8v5" />
-          <path d="M12 16h.01" />
-        </svg>
-      );
-    case 'reports':
-      return (
-        <svg {...common}>
-          <path d="M3 3v18h18" />
-          <path d="M7 15l4-4 3 3 5-6" />
-        </svg>
-      );
-    case 'manage-records':
-      return (
-        <svg {...common}>
-          <ellipse cx="12" cy="5" rx="8" ry="3" />
-          <path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5" />
-          <path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
-        </svg>
-      );
-    case 'logout':
-      return (
-        <svg {...common}>
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <path d="M16 17l5-5-5-5" />
-          <path d="M21 12H9" />
-        </svg>
-      );
-    case 'menu':
-      return (
-        <svg {...common}>
-          <path d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      );
-    case 'search':
-      return (
-        <svg {...common}>
-          <circle cx="11" cy="11" r="7" />
-          <path d="m20 20-3.5-3.5" />
-        </svg>
-      );
-    case 'bell':
-      return (
-        <svg {...common}>
-          <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
-          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-        </svg>
-      );
-    default:
-      return null;
-  }
+const ICONS = {
+  grid: (
+    <>
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </>
+  ),
+  users: (
+    <>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+    </>
+  ),
+  table: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M3 9h18M3 15h18M9 3v18" />
+    </>
+  ),
+  calendar: (
+    <>
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18m-12 6 2 2 4-4" />
+    </>
+  ),
+  file: (
+    <>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6M9 13h6M9 17h4" />
+    </>
+  ),
+  message: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
+  chart: (
+    <>
+      <path d="M3 3v18h18" />
+      <path d="m7 15 4-4 3 3 5-6" />
+    </>
+  ),
+  database: (
+    <>
+      <ellipse cx="12" cy="5" rx="9" ry="3" />
+      <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
+      <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3" />
+    </>
+  ),
+  bell: (
+    <>
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+    </>
+  ),
+  logout: (
+    <>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="m16 17 5-5-5-5M21 12H9" />
+    </>
+  ),
+  search: (
+    <>
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </>
+  ),
+  menu: <path d="M3 6h18M3 12h18M3 18h18" />,
 }
 
-function getInitials(name) {
-  const parts = String(name || '')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-  if (parts.length === 0) return 'T';
-  return parts
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() || '')
-    .join('');
+function Icon({ name, size = 18 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {ICONS[name]}
+    </svg>
+  )
 }
+
+const NAV = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'grid' },
+  { key: 'classes', label: 'Classes', icon: 'users' },
+  { key: 'gradebook', label: 'Gradebook', icon: 'table' },
+  { key: 'attendance', label: 'Attendance', icon: 'calendar' },
+  { key: 'quizzes', label: 'Quiz Manager', icon: 'file' },
+  { key: 'concerns', label: 'Grade Concerns', icon: 'message' },
+  { key: 'reports', label: 'Reports', icon: 'chart' },
+  { key: 'records', label: 'Manage Records', icon: 'database' },
+]
 
 function ComingSoon({ title }) {
   return (
-    <div className="tp-empty" role="region" aria-label={`${title} coming soon`}>
-      <h2 className="tp-empty-title">{title}</h2>
-      <p className="tp-empty-text">Coming soon. This section will be available in a future update.</p>
+    <div className="tp-page">
+      <div className="tp-card tp-soon">
+        <div className="tp-soon-icon">
+          <Icon name="grid" size={26} />
+        </div>
+        <h2 className="tp-soon-title">{title}</h2>
+        <p className="tp-soon-text">This page is coming soon.</p>
+      </div>
     </div>
-  );
+  )
 }
 
 function TeacherApp({ user, onLogout }) {
-  const [activeKey, setActiveKey] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [active, setActive] = useState('dashboard')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [search, setSearch] = useState('')
 
-  const displayName = user?.fullname || user?.name || user?.username || teacherProfile.name;
-  const unreadCount = useMemo(() => notifications.filter((n) => n.unread).length, []);
-  const activeItem = NAV_ITEMS.find((item) => item.key === activeKey) || NAV_ITEMS[0];
+  const fullName = user?.fullname || user?.username || 'Teacher'
+  const initials = fullName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('')
+  const current = NAV.find((n) => n.key === active)
 
-  const handleNav = (key) => {
-    setActiveKey(key);
-    setSidebarOpen(false);
-  };
+  const go = (key) => {
+    setActive(key)
+    setMenuOpen(false)
+  }
 
-  const handleLogout = () => {
-    setSidebarOpen(false);
-    if (typeof onLogout === 'function') onLogout();
-  };
+  let page
+  if (active === 'dashboard') {
+    page = <Dashboard user={user} onNavigate={go} />
+  } else if (active === 'records') {
+    // the original teacher CRUD page, unchanged
+    page = (
+      <div className="tp-page tp-records">
+        <Home user={user} onLogout={onLogout} />
+      </div>
+    )
+  } else {
+    page = <ComingSoon title={current ? current.label : 'Page'} />
+  }
 
   return (
     <div className="teacher-portal">
-      <aside className={`tp-sidebar ${sidebarOpen ? 'tp-open' : ''}`} aria-label="Teacher sidebar">
+      <div className={menuOpen ? 'tp-overlay show' : 'tp-overlay'} onClick={() => setMenuOpen(false)} />
+
+      <aside className={menuOpen ? 'tp-sidebar open' : 'tp-sidebar'}>
         <div className="tp-brand">
           <span className="tp-brand-mark">G</span>
-          <span>Teacher</span>
+          <div>
+            GLOBAI
+            <small>Teacher Portal</small>
+          </div>
         </div>
-        <nav className="tp-nav" aria-label="Teacher navigation">
-          {NAV_ITEMS.map((item) => (
+
+        <nav className="tp-nav">
+          {NAV.map((item) => (
             <button
               key={item.key}
               type="button"
-              className={`tp-nav-btn ${activeKey === item.key ? 'tp-active' : ''}`}
-              onClick={() => handleNav(item.key)}
+              className={active === item.key ? 'tp-nav-btn active' : 'tp-nav-btn'}
+              onClick={() => go(item.key)}
             >
-              <span className="tp-nav-icon">
-                <Icon name={item.key} />
-              </span>
+              <Icon name={item.icon} />
               <span>{item.label}</span>
             </button>
           ))}
-          <button type="button" className="tp-nav-btn tp-logout" onClick={handleLogout}>
-            <span className="tp-nav-icon">
-              <Icon name="logout" />
-            </span>
-            <span>Logout</span>
-          </button>
         </nav>
-      </aside>
 
-      <div
-        className={`tp-overlay ${sidebarOpen ? 'tp-show' : ''}`}
-        onClick={() => setSidebarOpen(false)}
-        aria-hidden="true"
-      />
+        <button type="button" className="tp-nav-btn tp-logout" onClick={onLogout}>
+          <Icon name="logout" />
+          <span>Logout</span>
+        </button>
+      </aside>
 
       <div className="tp-main">
         <header className="tp-topbar">
-          <div className="tp-topbar-left">
-            <button
-              type="button"
-              className="tp-menu-btn"
-              aria-label="Open menu"
-              aria-expanded={sidebarOpen}
-              onClick={() => setSidebarOpen((open) => !open)}
-            >
-              <Icon name="menu" />
-            </button>
-            <div className="tp-search">
-              <span className="tp-search-icon">
-                <Icon name="search" />
-              </span>
-              <input
-                className="tp-search-input"
-                type="search"
-                placeholder="Search students, classes, concerns..."
-                aria-label="Search"
-              />
-            </div>
+          <button type="button" className="tp-menu-btn" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
+            <Icon name="menu" size={20} />
+          </button>
+
+          <div className="tp-search">
+            <Icon name="search" size={16} />
+            <input
+              type="text"
+              value={search}
+              placeholder="Search students, classes, concerns..."
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-          <div className="tp-topbar-right">
+
+          <div className="tp-top-right">
             <button
               type="button"
               className="tp-icon-btn"
-              aria-label={`Notifications, ${unreadCount} unread`}
+              aria-label="Grade concerns"
+              onClick={() => go('concerns')}
             >
-              <Icon name="bell" />
-              {unreadCount > 0 && <span className="tp-badge">{unreadCount}</span>}
+              <Icon name="bell" size={19} />
+              {notificationCount > 0 && <span className="tp-bell-badge">{notificationCount}</span>}
             </button>
-            <div className="tp-user">
-              <div className="tp-avatar" aria-hidden="true">
-                {getInitials(displayName)}
-              </div>
-              <div className="tp-user-meta">
-                <span className="tp-user-name">{displayName}</span>
-                <span className="tp-user-role">Teacher</span>
+
+            <div className="tp-profile">
+              <span className="tp-avatar">{initials || 'T'}</span>
+              <div className="tp-profile-text">
+                <strong>{fullName}</strong>
+                <span>Teacher</span>
               </div>
             </div>
           </div>
         </header>
 
-        <main className="tp-content">
-          {activeKey === 'dashboard' ? (
-            <Dashboard user={user} />
-          ) : activeKey === 'manage-records' ? (
-            <div className="tp-manage-records">
-              <Home user={user} onLogout={onLogout} />
-            </div>
-          ) : (
-            <ComingSoon title={activeItem.label} />
-          )}
-        </main>
+        <main className="tp-content">{page}</main>
       </div>
     </div>
-  );
+  )
 }
 
-export default TeacherApp;
+export default TeacherApp
