@@ -1,287 +1,293 @@
-import {
-  studentProfile,
-  subjects,
-  overallGrade,
-  attendance,
-  upcomingQuizzes,
-  notifications,
-  gradeTrend,
-} from '../mockData';
+import { subjects, attendance, quizzes, notifications, gradeTrend } from '../mockData'
 
-function ProgressRing({ value, size = 120, stroke = 10 }) {
-  const radius = (size - stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const clamped = Math.max(0, Math.min(100, value));
-  const offset = circumference - (clamped / 100) * circumference;
+const RADIUS = 42
+const CIRC = 2 * Math.PI * RADIUS
 
-  return (
-    <div className="sp-ring-wrap" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        aria-label={`Overall grade ${clamped}%`}
-      >
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="#e2e8f0"
-          strokeWidth={stroke}
-          fill="none"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="#3B82F6"
-          strokeWidth={stroke}
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        />
-      </svg>
-      <div className="sp-ring-value">
-        <span className="sp-ring-number">{clamped}%</span>
-        <span className="sp-ring-label">Grade</span>
-      </div>
-    </div>
-  );
+function badgeClass(status) {
+  switch (status) {
+    case 'Good':
+    case 'Good Standing':
+    case 'Excellent':
+      return 'sp-badge sp-badge-green'
+    case 'Upcoming':
+    case 'New':
+      return 'sp-badge sp-badge-blue'
+    case 'Pending':
+    case 'Passing':
+      return 'sp-badge sp-badge-amber'
+    case 'Missed':
+    case 'At Risk':
+      return 'sp-badge sp-badge-red'
+    default:
+      return 'sp-badge sp-badge-gray'
+  }
 }
 
-function GradeTrendChart({ data }) {
-  const width = 520;
-  const height = 220;
-  const padding = { top: 20, right: 20, bottom: 36, left: 36 };
-  const chartW = width - padding.left - padding.right;
-  const chartH = height - padding.top - padding.bottom;
-  const minY = 70;
-  const maxY = 100;
-  const stepX = data.length > 1 ? chartW / (data.length - 1) : chartW;
+function Ring({ value }) {
+  return (
+    <div className="sp-ring">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="spRingGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#6366f1" />
+          </linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r={RADIUS} className="sp-ring-track" />
+        <circle
+          cx="50"
+          cy="50"
+          r={RADIUS}
+          className="sp-ring-bar"
+          stroke="url(#spRingGrad)"
+          strokeDasharray={CIRC}
+          strokeDashoffset={CIRC * (1 - value / 100)}
+          transform="rotate(-90 50 50)"
+        />
+      </svg>
+      <div className="sp-ring-label">
+        <strong>{value}%</strong>
+        <span>Average</span>
+      </div>
+    </div>
+  )
+}
 
-  const points = data.map((d, i) => {
-    const x = padding.left + i * stepX;
-    const y = padding.top + chartH - ((d.average - minY) / (maxY - minY)) * chartH;
-    return { x, y, ...d };
-  });
-  const line = points.map((p) => `${p.x},${p.y}`).join(' ');
-  const area = `${points[0]?.x ?? padding.left},${padding.top + chartH} ${line} ${
-    points[points.length - 1]?.x ?? padding.left + chartW
-  },${padding.top + chartH}`;
+function TrendChart({ data }) {
+  const min = 70
+  const max = 100
+  const ticks = [100, 90, 80, 70]
+
+  const pts = data.map((d, i) => ({
+    ...d,
+    x: ((i + 0.5) / data.length) * 100,
+    y: 100 - ((d.value - min) / (max - min)) * 100,
+  }))
+  const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ')
+  const area = `${line} L${pts[pts.length - 1].x},100 L${pts[0].x},100 Z`
 
   return (
-    <div className="sp-chart-wrap">
-      <svg
-        className="sp-chart"
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label="Grade trend line chart"
-      >
-        {[70, 80, 90, 100].map((tick) => {
-          const y = padding.top + chartH - ((tick - minY) / (maxY - minY)) * chartH;
-          return (
-            <g key={tick}>
-              <line
-                x1={padding.left}
-                y1={y}
-                x2={width - padding.right}
-                y2={y}
-                stroke="#e2e8f0"
-                strokeWidth="1"
-              />
-              <text x={padding.left - 8} y={y + 4} textAnchor="end" fontSize="11" fill="#64748b">
-                {tick}
-              </text>
-            </g>
-          );
-        })}
-        <polygon points={area} fill="rgba(59,130,246,0.12)" />
-        <polyline
-          points={line}
-          fill="none"
-          stroke="#3B82F6"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {points.map((p) => (
-          <g key={p.term}>
-            <circle cx={p.x} cy={p.y} r="4.5" fill="#1E3A8A" stroke="#ffffff" strokeWidth="2" />
-            <text x={p.x} y={height - 12} textAnchor="middle" fontSize="12" fill="#64748b">
-              {p.term}
-            </text>
-            <text
-              x={p.x}
-              y={p.y - 10}
-              textAnchor="middle"
-              fontSize="11"
-              fill="#1E3A8A"
-              fontWeight="600"
-            >
-              {p.average}
-            </text>
-          </g>
+    <div className="sp-chart">
+      <div className="sp-chart-y">
+        {ticks.map((t, i) => (
+          <span key={t} style={{ top: `${(i * 100) / 3}%` }}>
+            {t}
+          </span>
         ))}
-      </svg>
-    </div>
-  );
-}
-
-function statusPillClass(status) {
-  if (status === 'good' || status === 'upcoming') return 'good';
-  if (status === 'pending' || status === 'late') return 'pending';
-  return 'failed';
-}
-
-function Dashboard({ user }) {
-  const displayName = user?.fullname || user?.name || studentProfile.name;
-  const firstName = displayName.split(' ')[0] || 'Student';
-  const recent = notifications.slice(0, 3);
-
-  return (
-    <>
-      <div>
-        <h1 className="sp-page-title">Good day, {firstName}!</h1>
-        <p className="sp-page-subtitle">Here&apos;s your academic overview for this semester.</p>
       </div>
 
-      <div className="sp-grid sp-grid-top">
-        <section className="sp-card" aria-label="Overall grade">
-          <div className="sp-card-header">
+      <div className="sp-chart-plot">
+        {ticks.map((t, i) => (
+          <div key={t} className="sp-chart-grid" style={{ top: `${(i * 100) / 3}%` }} />
+        ))}
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="spAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={area} fill="url(#spAreaGrad)" />
+          <path d={line} className="sp-chart-line" vectorEffect="non-scaling-stroke" />
+        </svg>
+        {pts.map((p) => (
+          <div key={p.label} className="sp-chart-dot" style={{ left: `${p.x}%`, top: `${p.y}%` }}>
+            <span>{p.value}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="sp-chart-x" style={{ gridTemplateColumns: `repeat(${data.length}, 1fr)` }}>
+        {data.map((d) => (
+          <span key={d.label}>{d.label}</span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function Dashboard({ user, onNavigate }) {
+  const fullName = user?.fullname || user?.username || 'Student'
+  const firstName = fullName.split(' ')[0]
+
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  const overall = Math.round(subjects.reduce((sum, s) => sum + s.grade, 0) / subjects.length)
+  const best = [...subjects].sort((a, b) => b.grade - a.grade)[0]
+  const lowest = [...subjects].sort((a, b) => a.grade - b.grade)[0]
+  const standing =
+    overall >= 90 ? 'Excellent' : overall >= 80 ? 'Good Standing' : overall >= 75 ? 'Passing' : 'At Risk'
+
+  return (
+    <div className="sp-page">
+      {/* Hero */}
+      <section className="sp-hero">
+        <div>
+          <h1 className="sp-hero-title">
+            {greeting}, {firstName}!
+          </h1>
+          <p className="sp-hero-sub">Here’s your academic overview for this semester.</p>
+        </div>
+        <span className="sp-hero-chip">{today}</span>
+      </section>
+
+      {/* Top stat cards */}
+      <section className="sp-stats">
+        <article className="sp-card">
+          <div className="sp-card-head">
             <h2 className="sp-card-title">Overall Grade</h2>
-            <span className={`sp-pill ${overallGrade.value >= 75 ? 'good' : 'failed'}`}>
-              {overallGrade.value >= 75 ? 'Good Standing' : 'At Risk'}
-            </span>
+            <span className={badgeClass(standing)}>{standing}</span>
           </div>
           <div className="sp-overall">
-            <ProgressRing value={overallGrade.value} />
-            <div className="sp-overall-meta">
-              <div className="sp-item-title">{overallGrade.label}</div>
-              <div className="sp-muted">{overallGrade.note}</div>
-              <div className="sp-muted">Student: {displayName}</div>
-            </div>
-          </div>
-        </section>
-
-        <section className="sp-card" aria-label="Attendance rate">
-          <div className="sp-card-header">
-            <h2 className="sp-card-title">Attendance Rate</h2>
-            <span
-              className={`sp-pill ${
-                attendance.rate >= 90 ? 'good' : attendance.rate >= 80 ? 'pending' : 'failed'
-              }`}
-            >
-              {attendance.rate}% rate
-            </span>
-          </div>
-          <div className="sp-grade-big">{attendance.rate}%</div>
-          <div className="sp-muted">Attendance across all subjects</div>
-          <div className="sp-stat-grid">
-            <div className="sp-stat">
-              <span className="sp-stat-value">{attendance.present}</span>
-              <span className="sp-stat-label">Present</span>
-            </div>
-            <div className="sp-stat">
-              <span className="sp-stat-value">{attendance.late}</span>
-              <span className="sp-stat-label">Late</span>
-            </div>
-            <div className="sp-stat">
-              <span className="sp-stat-value">{attendance.absent}</span>
-              <span className="sp-stat-label">Absent</span>
-            </div>
-          </div>
-          <div className="sp-muted" style={{ marginTop: '10px' }}>
-            {attendance.present} of {attendance.total} sessions attended
-          </div>
-        </section>
-
-        <section className="sp-card" aria-label="Upcoming quizzes">
-          <div className="sp-card-header">
-            <h2 className="sp-card-title">Upcoming Quizzes</h2>
-          </div>
-          <ul className="sp-list">
-            {upcomingQuizzes.map((quiz) => (
-              <li key={quiz.id} className="sp-list-item">
-                <div className="sp-item-main">
-                  <span className="sp-item-title">{quiz.title}</span>
-                  <span className="sp-item-meta">{quiz.subject}</span>
-                  <span className="sp-item-meta">
-                    {quiz.date} · {quiz.time}
-                  </span>
-                </div>
-                <span className={`sp-pill ${statusPillClass(quiz.status)}`}>
-                  {quiz.status === 'late' ? 'Late' : 'Upcoming'}
-                </span>
+            <Ring value={overall} />
+            <ul className="sp-facts">
+              <li>
+                <span>Best subject</span>
+                <strong>
+                  {best.name} · {best.grade}%
+                </strong>
               </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+              <li>
+                <span>Needs attention</span>
+                <strong>
+                  {lowest.name} · {lowest.grade}%
+                </strong>
+              </li>
+              <li>
+                <span>Subjects enrolled</span>
+                <strong>{subjects.length}</strong>
+              </li>
+            </ul>
+          </div>
+        </article>
 
-      <section className="sp-card" aria-label="Subject cards">
-        <div className="sp-card-header">
-          <h2 className="sp-card-title">Subject Cards &amp; Partial Grades</h2>
+        <article className="sp-card">
+          <div className="sp-card-head">
+            <h2 className="sp-card-title">Attendance Rate</h2>
+            <span className="sp-badge sp-badge-green">{attendance.rate}% rate</span>
+          </div>
+          <div className="sp-big">{attendance.rate}%</div>
+          <p className="sp-muted">Attendance across all subjects</p>
+          <div className="sp-progress">
+            <span style={{ width: `${attendance.rate}%` }} />
+          </div>
+          <div className="sp-mini-grid">
+            <div className="sp-mini">
+              <strong>{attendance.present}</strong>
+              <span>Present</span>
+            </div>
+            <div className="sp-mini">
+              <strong>{attendance.late}</strong>
+              <span>Late</span>
+            </div>
+            <div className="sp-mini">
+              <strong>{attendance.absent}</strong>
+              <span>Absent</span>
+            </div>
+          </div>
+          <p className="sp-muted sp-mt">
+            {attendance.present} of {attendance.total} sessions attended
+          </p>
+        </article>
+
+        <article className="sp-card">
+          <div className="sp-card-head">
+            <h2 className="sp-card-title">Upcoming Quizzes</h2>
+            <button type="button" className="sp-link" onClick={() => onNavigate('quizzes')}>
+              View all
+            </button>
+          </div>
+          <div className="sp-list">
+            {quizzes.map((q) => (
+              <div key={q.id} className="sp-row">
+                <div>
+                  <strong className="sp-row-title">{q.title}</strong>
+                  <span className="sp-row-sub">{q.subject}</span>
+                  <span className="sp-row-sub">{q.when}</span>
+                </div>
+                <span className={badgeClass(q.status)}>{q.status}</span>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      {/* Subjects */}
+      <section className="sp-card sp-section">
+        <div className="sp-card-head">
+          <h2 className="sp-card-title">Subjects &amp; Partial Grades</h2>
+          <button type="button" className="sp-link" onClick={() => onNavigate('grades')}>
+            View grades
+          </button>
         </div>
         <div className="sp-subjects">
-          {subjects.map((subject) => (
-            <article key={subject.id} className="sp-subject-card">
-              <h3 className="sp-subject-name">{subject.name}</h3>
-              <p className="sp-subject-instructor">Instructor: {subject.instructor}</p>
-              <div className="sp-grade-row">
-                <span className="sp-grade-big">{subject.overall}%</span>
-                <span className={`sp-pill ${statusPillClass(subject.status)}`}>
-                  {subject.status === 'good' ? 'Good' : 'Pending'}
-                </span>
+          {subjects.map((s) => (
+            <div key={s.id} className="sp-subject">
+              <div className="sp-subject-top">
+                <div>
+                  <strong className="sp-subject-name">{s.name}</strong>
+                  <span className="sp-row-sub">Instructor: {s.instructor}</span>
+                </div>
+                <span className={badgeClass(s.status)}>{s.status}</span>
               </div>
-              <div className="sp-partials">
-                {subject.partials.map((part) => (
-                  <div key={part.label} className="sp-partial">
-                    <span>{part.label}</span>
-                    <div className="sp-bar">
-                      <div className="sp-bar-fill" style={{ width: `${part.grade}%` }} />
-                    </div>
-                    <span>{part.grade}</span>
+              <div className="sp-subject-grade">{s.grade}%</div>
+              {s.partials.map((p) => (
+                <div key={p.label} className="sp-partial">
+                  <span>{p.label}</span>
+                  <div className="sp-progress sp-progress-sm">
+                    <span style={{ width: `${p.score}%` }} />
                   </div>
-                ))}
-              </div>
-            </article>
+                  <em>{p.score}</em>
+                </div>
+              ))}
+            </div>
           ))}
         </div>
       </section>
 
-      <div className="sp-grid sp-grid-bottom">
-        <section className="sp-card" aria-label="Grade trend">
-          <div className="sp-card-header">
+      {/* Trend + notifications */}
+      <section className="sp-bottom">
+        <article className="sp-card">
+          <div className="sp-card-head">
             <h2 className="sp-card-title">Grade Trend</h2>
             <span className="sp-muted">Term averages</span>
           </div>
-          <GradeTrendChart data={gradeTrend} />
-        </section>
+          <TrendChart data={gradeTrend} />
+        </article>
 
-        <section className="sp-card" aria-label="Recent notifications">
-          <div className="sp-card-header">
+        <article className="sp-card">
+          <div className="sp-card-head">
             <h2 className="sp-card-title">Recent Notifications</h2>
+            <button type="button" className="sp-link" onClick={() => onNavigate('notifications')}>
+              View all
+            </button>
           </div>
-          <ul className="sp-list">
-            {recent.map((note) => (
-              <li key={note.id} className="sp-list-item">
-                <div className="sp-item-main">
-                  <span className="sp-item-title">{note.title}</span>
-                  <span className="sp-item-meta">{note.message}</span>
-                  <span className="sp-item-meta">{note.time}</span>
+          <div className="sp-list">
+            {notifications.map((n) => (
+              <div key={n.id} className={n.unread ? 'sp-note unread' : 'sp-note'}>
+                <span className="sp-note-dot" />
+                <div className="sp-note-body">
+                  <strong className="sp-row-title">{n.title}</strong>
+                  <span className="sp-row-sub">{n.text}</span>
+                  <span className="sp-row-time">{n.time}</span>
                 </div>
-                <span className={`sp-pill ${statusPillClass(note.type)}`}>
-                  {note.unread ? 'New' : 'Read'}
+                <span className={n.unread ? badgeClass('New') : badgeClass('Read')}>
+                  {n.unread ? 'New' : 'Read'}
                 </span>
-              </li>
+              </div>
             ))}
-          </ul>
-        </section>
-      </div>
-    </>
-  );
+          </div>
+        </article>
+      </section>
+    </div>
+  )
 }
 
-export default Dashboard;
+export default Dashboard

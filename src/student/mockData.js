@@ -1,128 +1,95 @@
-export const studentProfile = {
-  name: 'Juan Dela Cruz',
-  studentId: '2024-00123',
-  course: 'BS Information Technology',
-  year: '2nd Year',
-};
-
 export const subjects = [
   {
     id: 'prog1',
     name: 'Programming 1',
     instructor: 'Mr. Santos',
-    overall: 91,
-    status: 'good',
+    grade: 91,
+    status: 'Good',
     partials: [
-      { label: 'Prelim', grade: 89 },
-      { label: 'Midterm', grade: 92 },
-      { label: 'Finals', grade: 92 },
+      { label: 'Prelim', score: 89 },
+      { label: 'Midterm', score: 92 },
+      { label: 'Finals', score: 92 },
     ],
   },
   {
-    id: 'dbsys',
+    id: 'db',
     name: 'Database Systems',
     instructor: 'Ms. Reyes',
-    overall: 87,
-    status: 'good',
+    grade: 87,
+    status: 'Good',
     partials: [
-      { label: 'Prelim', grade: 85 },
-      { label: 'Midterm', grade: 88 },
-      { label: 'Finals', grade: 88 },
+      { label: 'Prelim', score: 85 },
+      { label: 'Midterm', score: 88 },
+      { label: 'Finals', score: 88 },
     ],
   },
   {
     id: 'net2',
     name: 'Networking 2',
     instructor: 'Engr. Garcia',
-    overall: 78,
-    status: 'pending',
+    grade: 78,
+    status: 'Pending',
     partials: [
-      { label: 'Prelim', grade: 76 },
-      { label: 'Midterm', grade: 79 },
-      { label: 'Finals', grade: 79 },
+      { label: 'Prelim', score: 76 },
+      { label: 'Midterm', score: 79 },
+      { label: 'Finals', score: 79 },
     ],
   },
-];
+]
 
-export const overallGrade = {
-  value: 85,
-  label: 'Overall Average',
-  note: 'On track for the semester',
-};
+export const attendance = { present: 47, late: 2, absent: 1, total: 50, rate: 94 }
 
-export const attendance = {
-  rate: 94,
-  present: 47,
-  total: 50,
-  late: 2,
-  absent: 1,
-};
-
-export const upcomingQuizzes = [
+export const quizzes = [
   {
-    id: 'q1',
+    id: 1,
     title: 'Arrays and Pointers Quiz',
     subject: 'Programming 1',
-    date: 'Nov 25, 2026',
-    time: '9:00 AM',
-    status: 'upcoming',
+    when: 'Nov 25, 2026 · 9:00 AM',
+    status: 'Upcoming',
   },
   {
-    id: 'q2',
+    id: 2,
     title: 'Normalization Drill',
     subject: 'Database Systems',
-    date: 'Nov 27, 2026',
-    time: '1:30 PM',
-    status: 'upcoming',
+    when: 'Nov 27, 2026 · 1:30 PM',
+    status: 'Upcoming',
   },
   {
-    id: 'q3',
+    id: 3,
     title: 'Subnetting Practical',
     subject: 'Networking 2',
-    date: 'Nov 20, 2026',
-    time: '10:00 AM',
-    status: 'late',
+    when: 'Nov 20, 2026 · 10:00 AM',
+    status: 'Missed',
   },
-];
+]
 
 export const notifications = [
   {
-    id: 'n1',
+    id: 1,
     title: 'Midterm grades posted',
-    message: 'Your Programming 1 midterm grade is now available.',
+    text: 'Your Programming 1 midterm grade is now available.',
     time: '2 hours ago',
     unread: true,
-    type: 'good',
   },
   {
-    id: 'n2',
+    id: 2,
     title: 'Quiz reminder',
-    message: 'Arrays and Pointers Quiz is scheduled on Nov 25, 9:00 AM.',
+    text: 'Arrays and Pointers Quiz is scheduled on Nov 25, 9:00 AM.',
     time: 'Today',
     unread: true,
-    type: 'pending',
   },
   {
-    id: 'n3',
+    id: 3,
     title: 'Attendance notice',
-    message: 'You were marked late in Networking 2 last Tuesday.',
+    text: 'You were marked late in Networking 2 last Tuesday.',
     time: 'Yesterday',
     unread: false,
-    type: 'pending',
   },
-  {
-    id: 'n4',
-    title: 'Grade concern update',
-    message: 'Your concern for Database Systems is under review.',
-    time: '3 days ago',
-    unread: false,
-    type: 'good',
-  },
-];
+]
 
 export const gradeTrend = [
-  { term: 'Prelim', average: 83 },
-  { term: 'Midterm', average: 86 },
-  { term: 'Prefinal', average: 84 },
-  { term: 'Finals', average: 85 },
-];
+  { label: 'Prelim', value: 83 },
+  { label: 'Midterm', value: 86 },
+  { label: 'Prefinal', value: 84 },
+  { label: 'Finals', value: 85 },
+]

@@ -1,243 +1,205 @@
-import { useMemo, useState } from 'react';
-import Dashboard from './pages/Dashboard';
-import { notifications, studentProfile } from './mockData';
-import './student.css';
+import { useState } from 'react'
+import './student.css'
+import Dashboard from './pages/Dashboard'
+import { notifications } from './mockData'
 
-const NAV_ITEMS = [
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'grades', label: 'My Grades' },
-  { key: 'attendance', label: 'Attendance' },
-  { key: 'quizzes', label: 'Quizzes' },
-  { key: 'concerns', label: 'Grade Concerns' },
-  { key: 'notifications', label: 'Notifications' },
-  { key: 'reports', label: 'Reports' },
-];
-
-function Icon({ name }) {
-  const common = {
-    width: 18,
-    height: 18,
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: '2',
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
-    'aria-hidden': 'true',
-  };
-  switch (name) {
-    case 'dashboard':
-      return (
-        <svg {...common}>
-          <rect x="3" y="3" width="8" height="8" rx="2" />
-          <rect x="13" y="3" width="8" height="5" rx="2" />
-          <rect x="13" y="10" width="8" height="11" rx="2" />
-          <rect x="3" y="13" width="8" height="8" rx="2" />
-        </svg>
-      );
-    case 'grades':
-      return (
-        <svg {...common}>
-          <path d="M4 19.5V5a2 2 0 0 1 2-2h11" />
-          <path d="M20 7v14l-4-2-4 2V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2z" />
-        </svg>
-      );
-    case 'attendance':
-      return (
-        <svg {...common}>
-          <rect x="3" y="4" width="18" height="17" rx="2" />
-          <path d="M8 2v4M16 2v4M3 10h18" />
-          <path d="m9 16 2 2 4-4" />
-        </svg>
-      );
-    case 'quizzes':
-      return (
-        <svg {...common}>
-          <path d="M14 2H6a2 2 0 0 0-2 2v16l4-2 4 2 4-2 4 2V8z" />
-          <path d="M14 2v6h6" />
-        </svg>
-      );
-    case 'concerns':
-      return (
-        <svg {...common}>
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 8v5" />
-          <path d="M12 16h.01" />
-        </svg>
-      );
-    case 'notifications':
-      return (
-        <svg {...common}>
-          <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
-          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-        </svg>
-      );
-    case 'reports':
-      return (
-        <svg {...common}>
-          <path d="M3 3v18h18" />
-          <path d="M7 15l4-4 3 3 5-6" />
-        </svg>
-      );
-    case 'logout':
-      return (
-        <svg {...common}>
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <path d="M16 17l5-5-5-5" />
-          <path d="M21 12H9" />
-        </svg>
-      );
-    case 'menu':
-      return (
-        <svg {...common}>
-          <path d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      );
-    case 'search':
-      return (
-        <svg {...common}>
-          <circle cx="11" cy="11" r="7" />
-          <path d="m20 20-3.5-3.5" />
-        </svg>
-      );
-    case 'bell':
-      return (
-        <svg {...common}>
-          <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
-          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-        </svg>
-      );
-    default:
-      return null;
-  }
+const ICONS = {
+  grid: (
+    <>
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </>
+  ),
+  book: (
+    <>
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </>
+  ),
+  calendar: (
+    <>
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
+    </>
+  ),
+  file: (
+    <>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6M9 13h6M9 17h4" />
+    </>
+  ),
+  message: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
+  bell: (
+    <>
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+    </>
+  ),
+  chart: (
+    <>
+      <path d="M3 3v18h18" />
+      <path d="m7 15 4-4 3 3 5-6" />
+    </>
+  ),
+  logout: (
+    <>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="m16 17 5-5-5-5M21 12H9" />
+    </>
+  ),
+  search: (
+    <>
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </>
+  ),
+  menu: <path d="M3 6h18M3 12h18M3 18h18" />,
 }
 
-function getInitials(name) {
-  const parts = String(name || '')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-  if (parts.length === 0) return 'S';
-  return parts
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() || '')
-    .join('');
+function Icon({ name, size = 18 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {ICONS[name]}
+    </svg>
+  )
 }
+
+const NAV = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'grid' },
+  { key: 'grades', label: 'My Grades', icon: 'book' },
+  { key: 'attendance', label: 'Attendance', icon: 'calendar' },
+  { key: 'quizzes', label: 'Quizzes', icon: 'file' },
+  { key: 'concerns', label: 'Grade Concerns', icon: 'message' },
+  { key: 'notifications', label: 'Notifications', icon: 'bell' },
+  { key: 'reports', label: 'Reports', icon: 'chart' },
+]
 
 function ComingSoon({ title }) {
   return (
-    <div className="sp-empty" role="region" aria-label={`${title} coming soon`}>
-      <h2 className="sp-empty-title">{title}</h2>
-      <p className="sp-empty-text">Coming soon. This section will be available in a future update.</p>
+    <div className="sp-page">
+      <div className="sp-card sp-soon">
+        <div className="sp-soon-icon">
+          <Icon name="grid" size={26} />
+        </div>
+        <h2 className="sp-soon-title">{title}</h2>
+        <p className="sp-soon-text">This page is coming soon.</p>
+      </div>
     </div>
-  );
+  )
 }
 
 function StudentApp({ user, onLogout }) {
-  const [activeKey, setActiveKey] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [active, setActive] = useState('dashboard')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [search, setSearch] = useState('')
 
-  const displayName = user?.fullname || user?.name || user?.username || studentProfile.name;
-  const unreadCount = useMemo(() => notifications.filter((n) => n.unread).length, []);
-  const activeItem = NAV_ITEMS.find((item) => item.key === activeKey) || NAV_ITEMS[0];
+  const fullName = user?.fullname || user?.username || 'Student'
+  const initials = fullName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('')
+  const unread = notifications.filter((n) => n.unread).length
+  const current = NAV.find((n) => n.key === active)
 
-  const handleNav = (key) => {
-    setActiveKey(key);
-    setSidebarOpen(false);
-  };
-
-  const handleLogout = () => {
-    setSidebarOpen(false);
-    if (typeof onLogout === 'function') onLogout();
-  };
+  const go = (key) => {
+    setActive(key)
+    setMenuOpen(false)
+  }
 
   return (
     <div className="student-portal">
-      <aside className={`sp-sidebar ${sidebarOpen ? 'sp-open' : ''}`} aria-label="Student sidebar">
+      <div className={menuOpen ? 'sp-overlay show' : 'sp-overlay'} onClick={() => setMenuOpen(false)} />
+
+      <aside className={menuOpen ? 'sp-sidebar open' : 'sp-sidebar'}>
         <div className="sp-brand">
           <span className="sp-brand-mark">G</span>
-          <span>GLOBAI Student</span>
+          <div>
+            GLOBAI
+            <small>Student Portal</small>
+          </div>
         </div>
-        <nav className="sp-nav" aria-label="Student navigation">
-          {NAV_ITEMS.map((item) => (
+
+        <nav className="sp-nav">
+          {NAV.map((item) => (
             <button
               key={item.key}
               type="button"
-              className={`sp-nav-btn ${activeKey === item.key ? 'sp-active' : ''}`}
-              onClick={() => handleNav(item.key)}
+              className={active === item.key ? 'sp-nav-btn active' : 'sp-nav-btn'}
+              onClick={() => go(item.key)}
             >
-              <span className="sp-nav-icon">
-                <Icon name={item.key} />
-              </span>
+              <Icon name={item.icon} />
               <span>{item.label}</span>
+              {item.key === 'notifications' && unread > 0 && <em className="sp-nav-badge">{unread}</em>}
             </button>
           ))}
-          <button type="button" className="sp-nav-btn sp-logout" onClick={handleLogout}>
-            <span className="sp-nav-icon">
-              <Icon name="logout" />
-            </span>
-            <span>Logout</span>
-          </button>
         </nav>
-      </aside>
 
-      <div
-        className={`sp-overlay ${sidebarOpen ? 'sp-show' : ''}`}
-        onClick={() => setSidebarOpen(false)}
-        aria-hidden="true"
-      />
+        <button type="button" className="sp-nav-btn sp-logout" onClick={onLogout}>
+          <Icon name="logout" />
+          <span>Logout</span>
+        </button>
+      </aside>
 
       <div className="sp-main">
         <header className="sp-topbar">
-          <div className="sp-topbar-left">
-            <button
-              type="button"
-              className="sp-menu-btn"
-              aria-label="Open menu"
-              aria-expanded={sidebarOpen}
-              onClick={() => setSidebarOpen((open) => !open)}
-            >
-              <Icon name="menu" />
-            </button>
-            <div className="sp-search">
-              <span className="sp-search-icon">
-                <Icon name="search" />
-              </span>
-              <input
-                className="sp-search-input"
-                type="search"
-                placeholder="Search subjects, quizzes, notifications..."
-                aria-label="Search"
-              />
-            </div>
+          <button type="button" className="sp-menu-btn" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
+            <Icon name="menu" size={20} />
+          </button>
+
+          <div className="sp-search">
+            <Icon name="search" size={16} />
+            <input
+              type="text"
+              value={search}
+              placeholder="Search subjects, quizzes, notifications..."
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-          <div className="sp-topbar-right">
+
+          <div className="sp-top-right">
             <button
               type="button"
               className="sp-icon-btn"
-              aria-label={`Notifications, ${unreadCount} unread`}
+              aria-label="Notifications"
+              onClick={() => go('notifications')}
             >
-              <Icon name="bell" />
-              {unreadCount > 0 && <span className="sp-badge">{unreadCount}</span>}
+              <Icon name="bell" size={19} />
+              {unread > 0 && <span className="sp-bell-badge">{unread}</span>}
             </button>
-            <div className="sp-user">
-              <div className="sp-avatar" aria-hidden="true">
-                {getInitials(displayName)}
-              </div>
-              <div className="sp-user-meta">
-                <span className="sp-user-name">{displayName}</span>
-                <span className="sp-user-role">Student</span>
+
+            <div className="sp-profile">
+              <span className="sp-avatar">{initials || 'S'}</span>
+              <div className="sp-profile-text">
+                <strong>{fullName}</strong>
+                <span>Student</span>
               </div>
             </div>
           </div>
         </header>
 
         <main className="sp-content">
-          {activeKey === 'dashboard' ? <Dashboard user={user} /> : <ComingSoon title={activeItem.label} />}
+          {active === 'dashboard' ? (
+            <Dashboard user={user} onNavigate={go} />
+          ) : (
+            <ComingSoon title={current ? current.label : 'Page'} />
+          )}
         </main>
       </div>
     </div>
-  );
+  )
 }
 
-export default StudentApp;
+export default StudentApp
