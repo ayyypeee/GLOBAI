@@ -2,7 +2,6 @@ import { useState } from 'react'
 import './teacher.css'
 import Dashboard from './pages/Dashboard'
 import Home from '../pages/Home'
-import { notificationCount } from './mockData'
 
 const ICONS = {
   grid: (
@@ -114,6 +113,8 @@ function ComingSoon({ title }) {
     </div>
   )
 }
+
+const notificationCount = 0
 
 function TeacherApp({ user, onLogout }) {
   const [active, setActive] = useState('dashboard')

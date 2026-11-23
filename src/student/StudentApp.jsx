@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import './student.css'
 import Dashboard from './pages/Dashboard'
-import { notifications } from './mockData'
 
 const ICONS = {
   grid: (
@@ -111,7 +110,7 @@ function StudentApp({ user, onLogout }) {
     .slice(0, 2)
     .map((w) => w[0].toUpperCase())
     .join('')
-  const unread = notifications.filter((n) => n.unread).length
+  const unread = 0
   const current = NAV.find((n) => n.key === active)
 
   const go = (key) => {
@@ -127,7 +126,7 @@ function StudentApp({ user, onLogout }) {
         <div className="sp-brand">
           <span className="sp-brand-mark">G</span>
           <div>
-            Student
+            Teacher
             <small>Student Portal</small>
           </div>
         </div>
