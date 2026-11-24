@@ -3,20 +3,22 @@ import './App.css'
 import './auth/auth.css'
 import Login from './auth/AuthLogin'
 import Register from './auth/AuthRegister'
-import Home from './pages/Home'
 import StudentApp from './student/StudentApp'
 import TeacherApp from './teacher/TeacherApp'
 
-function App() {
-  const [view, setView] = useState('login') // 'login' or 'register'
-  const [user, setUser] = useState(null) // the logged-in user
-  const [notice, setNotice] = useState('') // message shown on the login page
+const PORTALS = {
+  STUDENT: StudentApp,
+  TEACHER: TeacherApp,
+}
 
-  // after login
+function App() {
+  const [view, setView] = useState('login')
+  const [user, setUser] = useState(null)
+  const [notice, setNotice] = useState('')
+
   if (user) {
-    if (user.role === 'STUDENT') return <StudentApp user={user} onLogout={() => setUser(null)} />
-    if (user.role === 'TEACHER') return <TeacherApp user={user} onLogout={() => setUser(null)} />
-    return <Home user={user} onLogout={() => setUser(null)} />
+    const Portal = PORTALS[user.role]
+    if (Portal) return <Portal user={user} onLogout={() => setUser(null)} />
   }
 
   if (view === 'register') {

@@ -1,0 +1,244 @@
+.ui-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 36, 96, 0.45);
+}
+.ui-modal {
+  width: 100%;
+  max-width: 440px;
+  padding: 28px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(15, 36, 96, 0.3);
+}
+.ui-modal h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  color: #1e3a8a;
+}
+.ui-modal p {
+  margin: 0 0 18px;
+  font-size: 14px;
+  color: #64748b;
+}
+.ui-field {
+  display: block;
+  margin-bottom: 14px;
+}
+.ui-field span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+.ui-field input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #dbe2ef;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+.ui-field input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.ui-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  box-shadow: 0 6px 14px rgba(30, 58, 138, 0.25);
+}
+.ui-btn:hover {
+  filter: brightness(1.08);
+}
+.ui-btn-ghost {
+  color: #1e3a8a;
+  background: #eef2ff;
+  box-shadow: none;
+}
+.ui-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.ui-head h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+.ui-head p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+.ui-card {
+  padding: 22px;
+  background: #fff;
+  border: 1px solid #e5e9f2;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(30, 58, 138, 0.05);
+}
+
+.ui-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 36px 16px;
+  text-align: center;
+  font-size: 13.5px;
+  color: #64748b;
+}
+.ui-empty strong {
+  font-size: 15px;
+  color: #0f172a;
+}
+.ui-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 6px;
+  border-radius: 14px;
+  color: #3b82f6;
+  background: #eef4ff;
+}
+
+.ui-classes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.ui-class {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px;
+  text-align: left;
+  font: inherit;
+  background: #fff;
+  border: 1px solid #e5e9f2;
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(30, 58, 138, 0.05);
+}
+button.ui-class {
+  cursor: pointer;
+}
+button.ui-class:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+.ui-class h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+.ui-class p {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+}
+.ui-code {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #1e3a8a;
+}
+.ui-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ui-badge-accepted {
+  color: #166534;
+  background: #dcfce7;
+}
+.ui-portal {
+  min-height: 100vh;
+  background: #eef4ff;
+}
+.ui-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e3a8a;
+  background: #fff;
+  border-bottom: 1px solid #e5e9f2;
+}
+.ui-top-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ui-top .au-logo {
+  background: #1e3a8a;
+  border-color: transparent;
+}
+.ui-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.ui-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 26px;
+  margin-bottom: 24px;
+  color: #fff;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0f2460, #1e3a8a 60%, #3b82f6);
+  box-shadow: 0 16px 36px rgba(30, 58, 138, 0.22);
+}
+.ui-banner-avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+}
+.ui-banner h1 {
+  margin: 0;
+  font-size: 20px;
+}
+.ui-banner span {
+  font-size: 13px;
+  color: rgba(226, 232, 255, 0.85);
+}

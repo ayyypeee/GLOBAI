@@ -1,8 +1,17 @@
 import { useState } from 'react'
 import './student.css'
 import Dashboard from './pages/Dashboard'
+import MyClasses from './pages/MyClasses'
+import { BrandMark } from '../auth/AuthLayout'
 
 const ICONS = {
+  users: (
+    <>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+    </>
+  ),
   grid: (
     <>
       <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -75,6 +84,7 @@ function Icon({ name, size = 18 }) {
 }
 
 const NAV = [
+  { key: 'classes', label: 'My Classes', icon: 'users' },
   { key: 'dashboard', label: 'Dashboard', icon: 'grid' },
   { key: 'grades', label: 'My Grades', icon: 'book' },
   { key: 'attendance', label: 'Attendance', icon: 'calendar' },
@@ -102,6 +112,7 @@ function StudentApp({ user, onLogout }) {
   const [active, setActive] = useState('dashboard')
   const [menuOpen, setMenuOpen] = useState(false)
   const [search, setSearch] = useState('')
+  const [course, setCourse] = useState(null)
 
   const fullName = user?.fullname || user?.username || 'Student'
   const initials = fullName
@@ -114,8 +125,18 @@ function StudentApp({ user, onLogout }) {
   const current = NAV.find((n) => n.key === active)
 
   const go = (key) => {
+    if (key === 'classes') {
+      setCourse(null)
+      setActive('dashboard')
+      setMenuOpen(false)
+      return
+    }
     setActive(key)
     setMenuOpen(false)
+  }
+
+  if (!course) {
+    return <MyClasses user={user} onOpen={setCourse} onLogout={onLogout} />
   }
 
   return (
@@ -124,9 +145,9 @@ function StudentApp({ user, onLogout }) {
 
       <aside className={menuOpen ? 'sp-sidebar open' : 'sp-sidebar'}>
         <div className="sp-brand">
-          <span className="sp-brand-mark">G</span>
+          <BrandMark size={40} />
           <div>
-            Teacher
+            Academiko
             <small>Student Portal</small>
           </div>
         </div>
@@ -183,7 +204,7 @@ function StudentApp({ user, onLogout }) {
               <span className="sp-avatar">{initials || 'S'}</span>
               <div className="sp-profile-text">
                 <strong>{fullName}</strong>
-                <span>Student</span>
+                <span>Class {course.code}</span>
               </div>
             </div>
           </div>

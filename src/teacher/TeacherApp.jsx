@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import './teacher.css'
 import Dashboard from './pages/Dashboard'
-import Home from '../pages/Home'
+import Classes from './pages/Classes'
+
+import { BrandMark } from '../auth/AuthLayout'
 
 const ICONS = {
   grid: (
@@ -42,13 +44,6 @@ const ICONS = {
     <>
       <path d="M3 3v18h18" />
       <path d="m7 15 4-4 3 3 5-6" />
-    </>
-  ),
-  database: (
-    <>
-      <ellipse cx="12" cy="5" rx="9" ry="3" />
-      <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
-      <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3" />
     </>
   ),
   bell: (
@@ -97,7 +92,6 @@ const NAV = [
   { key: 'quizzes', label: 'Quiz Manager', icon: 'file' },
   { key: 'concerns', label: 'Grade Concerns', icon: 'message' },
   { key: 'reports', label: 'Reports', icon: 'chart' },
-  { key: 'records', label: 'Manage Records', icon: 'database' },
 ]
 
 function ComingSoon({ title }) {
@@ -135,16 +129,11 @@ function TeacherApp({ user, onLogout }) {
     setMenuOpen(false)
   }
 
-  let page
+    let page
   if (active === 'dashboard') {
     page = <Dashboard user={user} onNavigate={go} />
-  } else if (active === 'records') {
-    // the original teacher CRUD page, unchanged
-    page = (
-      <div className="tp-page tp-records">
-        <Home user={user} onLogout={onLogout} />
-      </div>
-    )
+  } else if (active === 'classes') {
+    page = <Classes />
   } else {
     page = <ComingSoon title={current ? current.label : 'Page'} />
   }
@@ -155,9 +144,9 @@ function TeacherApp({ user, onLogout }) {
 
       <aside className={menuOpen ? 'tp-sidebar open' : 'tp-sidebar'}>
         <div className="tp-brand">
-          <span className="tp-brand-mark">G</span>
+          <BrandMark size={40} />
           <div>
-            Teacher
+            Academiko
             <small>Teacher Portal</small>
           </div>
         </div>

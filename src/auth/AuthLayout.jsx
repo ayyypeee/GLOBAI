@@ -102,12 +102,20 @@ export function BrandMark({ size = 44 }) {
   )
 }
 
-// Student / Teacher segmented control with a sliding pill
-export function RoleToggle({ role, onChange }) {
+const DEFAULT_ROLES = ['Student', 'Teacher']
+
+export function RoleToggle({ role, onChange, roles = DEFAULT_ROLES }) {
+  const index = roles.indexOf(role)
   return (
-    <div className="au-seg" role="tablist">
-      <span className={role === 'Teacher' ? 'au-seg-pill right' : 'au-seg-pill'} />
-      {['Student', 'Teacher'].map((item) => (
+    <div className="au-seg" role="tablist" style={{ gridTemplateColumns: `repeat(${roles.length}, 1fr)` }}>
+      <span
+        className="au-seg-pill"
+        style={{
+          width: `calc((100% - 8px) / ${roles.length})`,
+          transform: `translateX(${index * 100}%)`,
+        }}
+      />
+      {roles.map((item) => (
         <button
           key={item}
           type="button"
@@ -201,7 +209,7 @@ function AuthLayout({ children }) {
                   <span className="au-step-num">2</span>
                   <div>
                     <strong>Choose your role</strong>
-                    <p>Pick Student or Teacher to open your portal.</p>
+                    <p>Pick your role to open your portal.</p>
                   </div>
                 </li>
                 <li>
