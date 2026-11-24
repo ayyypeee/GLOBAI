@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { usePersisted } from '../shared/usePersisted'
 import './teacher.css'
 import Dashboard from './pages/Dashboard'
 import Classes from './pages/Classes'
@@ -111,7 +112,7 @@ function ComingSoon({ title }) {
 const notificationCount = 0
 
 function TeacherApp({ user, onLogout }) {
-  const [active, setActive] = useState('dashboard')
+  const [active, setActive] = usePersisted(`globai-teacher-tab-${user?.userid}`, 'dashboard')
   const [menuOpen, setMenuOpen] = useState(false)
   const [search, setSearch] = useState('')
 
@@ -127,6 +128,10 @@ function TeacherApp({ user, onLogout }) {
   const go = (key) => {
     setActive(key)
     setMenuOpen(false)
+  }
+  const logout = () => {
+    setActive('dashboard')
+    onLogout()
   }
 
     let page
@@ -165,7 +170,7 @@ function TeacherApp({ user, onLogout }) {
           ))}
         </nav>
 
-        <button type="button" className="tp-nav-btn tp-logout" onClick={onLogout}>
+        <button type="button" className="tp-nav-btn tp-logout" onClick={logout}>
           <Icon name="logout" />
           <span>Logout</span>
         </button>

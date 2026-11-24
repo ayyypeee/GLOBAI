@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { usePersisted } from '../shared/usePersisted'
 import './student.css'
 import Dashboard from './pages/Dashboard'
 import MyClasses from './pages/MyClasses'
@@ -109,10 +110,10 @@ function ComingSoon({ title }) {
 }
 
 function StudentApp({ user, onLogout }) {
-  const [active, setActive] = useState('dashboard')
+  const [active, setActive] = usePersisted(`globai-student-tab-${user?.userid}`, 'dashboard')
   const [menuOpen, setMenuOpen] = useState(false)
   const [search, setSearch] = useState('')
-  const [course, setCourse] = useState(null)
+  const [course, setCourse] = usePersisted(`globai-student-class-${user?.userid}`, null)
 
   const fullName = user?.fullname || user?.username || 'Student'
   const initials = fullName
@@ -133,6 +134,15 @@ function StudentApp({ user, onLogout }) {
     }
     setActive(key)
     setMenuOpen(false)
+  }
+    const logout = () => {
+    setCourse(null)
+    setActive('dashboard')
+    onLogout()
+  }
+
+  if (!course) {
+    return <MyClasses user={user} onOpen={setCourse} onLogout={logout} />
   }
 
   if (!course) {
@@ -167,7 +177,7 @@ function StudentApp({ user, onLogout }) {
           ))}
         </nav>
 
-        <button type="button" className="sp-nav-btn sp-logout" onClick={onLogout}>
+        <button type="button" className="sp-nav-btn sp-logout" onClick={logout}>
           <Icon name="logout" />
           <span>Logout</span>
         </button>

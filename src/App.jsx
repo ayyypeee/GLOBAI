@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { usePersisted } from './shared/usePersisted'
 import './App.css'
 import './auth/auth.css'
 import Login from './auth/AuthLogin'
@@ -13,7 +14,7 @@ const PORTALS = {
 
 function App() {
   const [view, setView] = useState('login')
-  const [user, setUser] = useState(null)
+  const [user, setUser] = usePersisted('globai-user', null)
   const [notice, setNotice] = useState('')
 
   if (user) {
@@ -37,8 +38,10 @@ function App() {
     <Login
       notice={notice}
       onLoginSuccess={(u) => {
+        const saved = { ...u }
+        delete saved.password
         setNotice('')
-        setUser(u)
+        setUser(saved)
       }}
       onGoRegister={() => {
         setNotice('')

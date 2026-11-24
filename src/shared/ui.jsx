@@ -1,14 +1,16 @@
+import { createPortal } from 'react-dom'
 import './ui.css'
 
 export function Modal({ title, text, onClose, children }) {
-  return (
+  return createPortal(
     <div className="ui-overlay" onClick={onClose}>
       <div className="ui-modal" onClick={(e) => e.stopPropagation()}>
         <h2>{title}</h2>
         {text && <p>{text}</p>}
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
