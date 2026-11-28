@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { postNewUser } from '../api'
+import { register } from '../api'
 import AuthLayout, {
   AuthField,
   RoleToggle,
@@ -15,30 +15,44 @@ function AuthRegister({ onBack, onRegistered }) {
   const [fullname, setFullname] = useState('')
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
+  const [program, setProgram] = useState('')
+  const [yearlevel, setYearlevel] = useState('')
+  const [department, setDepartment] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const isStudent = role === 'Student'
+
+  const validate = () => {
+    if (!fullname.trim() || !username.trim() || !email.trim()) return 'Please fill in all fields.'
+    if (isStudent && !program.trim()) return 'Enter your program.'
+    if (isStudent && !(Number(yearlevel) >= 1 && Number(yearlevel) <= 6)) return 'Year level must be from 1 to 6.'
+    if (!isStudent && !department.trim()) return 'Enter your department.'
+    if (password.length < 6) return 'Password must be at least 6 characters.'
+    if (password !== confirm) return 'Passwords do not match.'
+    return ''
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError('')
-    if (!fullname.trim() || !username.trim() || !email.trim()) {
-      setError('Please fill in all fields.')
-      return
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
-      return
-    }
-    if (password !== confirm) {
-      setError('Passwords do not match.')
-      return
-    }
+    const problem = validate()
+    setError(problem)
+    if (problem) return
     setLoading(true)
     try {
-      await postNewUser({ username, password, role: role.toUpperCase(), fullname, email })
+      await register({
+        username: username.trim(),
+        password,
+        role: role.toUpperCase(),
+        fullname: fullname.trim(),
+        email: email.trim(),
+        program: isStudent ? program.trim() : null,
+        yearlevel: isStudent ? Number(yearlevel) : null,
+        department: isStudent ? null : department.trim(),
+      })
       onRegistered('Registration successful! You can now log in.')
     } catch (err) {
       setError(err.message)
@@ -94,6 +108,35 @@ function AuthRegister({ onBack, onRegistered }) {
             autoComplete="email"
             onChange={setEmail}
           />
+          {isStudent ? (
+            <>
+              <AuthField
+                label="Program"
+                icon={<UserIcon />}
+                type="text"
+                value={program}
+                placeholder="e.g. BSIT"
+                onChange={setProgram}
+              />
+              <AuthField
+                label="Year level"
+                icon={<UserIcon />}
+                type="number"
+                value={yearlevel}
+                placeholder="1 to 6"
+                onChange={setYearlevel}
+              />
+            </>
+          ) : (
+            <AuthField
+              label="Department"
+              icon={<UserIcon />}
+              type="text"
+              value={department}
+              placeholder="e.g. College of Computer Studies"
+              onChange={setDepartment}
+            />
+          )}
           <AuthField
             label="Password"
             icon={<LockIcon />}

@@ -10,7 +10,6 @@ import AuthLayout, {
   CheckIcon,
 } from './AuthLayout'
 
-
 function AuthLogin({ notice, onLoginSuccess, onGoRegister }) {
   const [role, setRole] = useState('Student')
   const [username, setUsername] = useState('')
@@ -23,9 +22,13 @@ function AuthLogin({ notice, onLoginSuccess, onGoRegister }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    if (!username.trim() || !password) {
+      setError('Enter your username and password.')
+      return
+    }
     setLoading(true)
     try {
-      const user = await login(username, password)
+      const user = await login(username.trim(), password)
       if (user.role !== role.toUpperCase()) {
         throw new Error(`This is not a ${role.toLowerCase()} account.`)
       }
@@ -43,7 +46,7 @@ function AuthLogin({ notice, onLoginSuccess, onGoRegister }) {
         <h1 className="au-title">Welcome back</h1>
         <p className="au-subtitle">Sign in to continue to your portal</p>
 
-        <RoleToggle role={role} onChange={setRole}/>
+        <RoleToggle role={role} onChange={setRole} />
 
         {notice && (
           <div className="au-alert au-alert-success">
@@ -90,7 +93,7 @@ function AuthLogin({ notice, onLoginSuccess, onGoRegister }) {
 
           {showForgot && (
             <div className="au-alert au-alert-info">
-              <span>Please contact your administrator to reset your password.</span>
+              <span>Password reset is not available yet.</span>
             </div>
           )}
 

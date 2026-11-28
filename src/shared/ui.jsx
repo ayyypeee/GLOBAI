@@ -1,10 +1,19 @@
+import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import './ui.css'
 
-export function Modal({ title, text, onClose, children }) {
+export function Modal({ title, text, onClose, wide, children }) {
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   return createPortal(
     <div className="ui-overlay" onClick={onClose}>
-      <div className="ui-modal" onClick={(e) => e.stopPropagation()}>
+      <div className={wide ? 'ui-modal ui-modal-wide' : 'ui-modal'} onClick={(e) => e.stopPropagation()}>
         <h2>{title}</h2>
         {text && <p>{text}</p>}
         {children}
@@ -14,7 +23,22 @@ export function Modal({ title, text, onClose, children }) {
   )
 }
 
-export function Field({ label, value, onChange, type = 'text', placeholder }) {
+export function Confirm({ title, text, label, busy, onConfirm, onCancel }) {
+  return (
+    <Modal title={title} text={text} onClose={onCancel}>
+      <div className="ui-actions">
+        <button type="button" className="ui-btn ui-btn-ghost" onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="button" className="ui-btn ui-btn-danger" disabled={busy} onClick={onConfirm}>
+          {busy ? 'Please wait...' : label}
+        </button>
+      </div>
+    </Modal>
+  )
+}
+
+export function Field({ label, value, onChange, type = 'text', placeholder, min, max }) {
   return (
     <label className="ui-field">
       <span>{label}</span>
@@ -22,11 +46,17 @@ export function Field({ label, value, onChange, type = 'text', placeholder }) {
         type={type}
         value={value}
         placeholder={placeholder}
+        min={min}
+        max={max}
         onChange={(e) => onChange(e.target.value)}
         required
       />
     </label>
   )
+}
+
+export function Alert({ children }) {
+  return <div className="ui-alert">{children}</div>
 }
 
 export function PlusIcon() {

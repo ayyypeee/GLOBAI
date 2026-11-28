@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.csit321G5.Globai.entity.CourseEntity;
@@ -23,13 +24,18 @@ public class CourseController {
     CourseService cserv;
 
     @PostMapping("/postCourse")
-    public CourseEntity postCourse(@RequestBody CourseEntity course) {
-        return cserv.postCourse(course);
+    public CourseEntity postCourse(@RequestBody CourseEntity course, @RequestParam(required = false) Integer userid) {
+        return cserv.postCourse(course, userid);
     }
 
     @GetMapping("/getAllCourses")
     public List<CourseEntity> getAllCourses() {
         return cserv.getAllCourses();
+    }
+
+    @GetMapping("/getCoursesByTeacher/{userid}")
+    public List<CourseEntity> getCoursesByTeacher(@PathVariable int userid) {
+        return cserv.getCoursesByTeacher(userid);
     }
 
     @PutMapping("/putCourse/{code}")

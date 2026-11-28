@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { students, teachers, courses, enrollments } from '../../api'
+import { courses, enrollments } from '../../api'
 
 const STAT_ICONS = {
   users: (
@@ -116,15 +116,18 @@ function BarChart({ data }) {
 }
 
 function Dashboard({ user, onNavigate }) {
-  const [data, setData] = useState({ students: [], teachers: [], courses: [], enrollments: [] })
+  const [myCourses, setMyCourses] = useState([])
+  const [myEnrollments, setMyEnrollments] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([students.getAll(), teachers.getAll(), courses.getAll(), enrollments.getAll()])
-      .then(([s, t, c, e]) => {
-        if (!cancelled) setData({ students: s, teachers: t, courses: c, enrollments: e })
+    Promise.all([courses.byTeacher(user.userid), enrollments.byTeacher(user.userid)])
+      .then(([c, e]) => {
+        if (cancelled) return
+        setMyCourses(c)
+        setMyEnrollments(e)
       })
       .catch((err) => {
         if (!cancelled) setError(err.message)
@@ -135,12 +138,11 @@ function Dashboard({ user, onNavigate }) {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [user.userid])
 
-  const myCourses = data.courses.filter((c) => c.teacher?.user?.userid === user?.userid)
-  const myCodes = new Set(myCourses.map((c) => c.coursecode))
-  const myEnrollments = data.enrollments.filter((e) => myCodes.has(e.course?.coursecode))
   const myStudentIds = new Set(myEnrollments.map((e) => e.student?.studentid))
+  const totalUnits = myCourses.reduce((sum, c) => sum + c.units, 0)
+  const average = myCourses.length === 0 ? 0 : Math.round((myEnrollments.length / myCourses.length) * 10) / 10
 
   const classSizes = myCourses.map((c) => ({
     code: c.coursecode,
@@ -152,10 +154,10 @@ function Dashboard({ user, onNavigate }) {
 
   const show = (n) => (loading ? '…' : n)
   const stats = [
-    { key: 'students', icon: 'users', tone: 'blue', label: 'Total Students', value: show(data.students.length), note: 'Registered in the system' },
-    { key: 'courses', icon: 'book', tone: 'green', label: 'My Courses', value: show(myCourses.length), note: 'Courses you teach' },
-    { key: 'enrolled', icon: 'check', tone: 'amber', label: 'Enrolled Students', value: show(myStudentIds.size), note: 'Across your courses' },
-    { key: 'teachers', icon: 'badge', tone: 'blue', label: 'Teachers', value: show(data.teachers.length), note: 'Registered teachers' },
+    { key: 'courses', icon: 'book', tone: 'green', label: 'My Classes', value: show(myCourses.length), note: 'Subjects you teach' },
+    { key: 'students', icon: 'users', tone: 'blue', label: 'My Students', value: show(myStudentIds.size), note: 'Across your classes' },
+    { key: 'average', icon: 'check', tone: 'amber', label: 'Average Class Size', value: show(average), note: 'Students per class' },
+    { key: 'units', icon: 'badge', tone: 'blue', label: 'Total Units', value: show(totalUnits), note: 'Units you handle' },
   ]
 
   const fullName = user?.fullname || user?.username || 'Teacher'
@@ -176,8 +178,8 @@ function Dashboard({ user, onNavigate }) {
           <p className="tp-hero-sub">Monitor your classes, attendance, and student concerns at a glance.</p>
         </div>
         <div className="tp-hero-actions">
-          <button type="button" className="tp-btn tp-btn-light" onClick={() => onNavigate('attendance')}>
-            Take attendance
+          <button type="button" className="tp-btn tp-btn-light" onClick={() => onNavigate('classes')}>
+            Manage classes
           </button>
           <button type="button" className="tp-btn tp-btn-ghost" onClick={() => onNavigate('gradebook')}>
             Open gradebook
@@ -205,15 +207,15 @@ function Dashboard({ user, onNavigate }) {
       <section className="tp-two">
         <article className="tp-card">
           <div className="tp-card-head">
-            <h2 className="tp-card-title">Class Size by Course</h2>
-            <span className="tp-muted">Enrolled students</span>
+            <h2 className="tp-card-title">Class Size by Subject</h2>
+            <span className="tp-muted">Students per class</span>
           </div>
           {loading ? (
             <div className="tp-loading">Loading...</div>
           ) : classSizes.length === 0 ? (
             <EmptyState
-              title="No courses yet"
-              text="No courses are assigned to you. Add one under Manage Records, then Courses."
+              title="No classes yet"
+              text="Create a subject under Classes and your students will show up here."
             />
           ) : (
             <BarChart data={classSizes} />
@@ -239,15 +241,15 @@ function Dashboard({ user, onNavigate }) {
 
         <article className="tp-card">
           <div className="tp-card-head">
-            <h2 className="tp-card-title">Recent Enrollments</h2>
-            <button type="button" className="tp-link" onClick={() => onNavigate('records')}>
-              Manage records
+            <h2 className="tp-card-title">Recent Joins</h2>
+            <button type="button" className="tp-link" onClick={() => onNavigate('classes')}>
+              View classes
             </button>
           </div>
           {loading ? (
             <div className="tp-loading">Loading...</div>
           ) : recent.length === 0 ? (
-            <EmptyState title="No enrollments yet" text="New enrollments in your courses will appear here." />
+            <EmptyState title="No students yet" text="Students who join your classes will appear here." />
           ) : (
             <div className="tp-timeline">
               {recent.map((e) => (

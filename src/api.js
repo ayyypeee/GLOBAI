@@ -1,16 +1,22 @@
-const BASE = 'http://localhost:8080'
-const JSON_HEADERS = { 'Content-Type': 'application/json' }
+const BASE = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:8080`
+
+export class ApiError extends Error {
+  constructor(message, status) {
+    super(message)
+    this.status = status
+  }
+}
 
 async function request(path, options = {}) {
   let res
   try {
     res = await fetch(`${BASE}${path}`, options)
   } catch {
-    throw new Error('Cannot reach the server. Is the backend running?')
+    throw new ApiError('Cannot reach the server. Is the backend running?', 0)
   }
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
-    throw new Error(data.message || 'Something went wrong.')
+    throw new ApiError(data.message || 'Something went wrong.', res.status)
   }
   return res
 }
@@ -22,8 +28,8 @@ function read(path) {
 function send(method, path, body) {
   return request(path, {
     method,
-    headers: JSON_HEADERS,
-    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
   }).then((res) => res.json())
 }
 
@@ -31,29 +37,24 @@ function remove(path) {
   return request(path, { method: 'DELETE' }).then((res) => res.text())
 }
 
-function resource(group, name) {
-  return {
-    getAll: () => read(`/${group}/api/getAll${name}s`),
-    post: (item) => send('POST', `/${group}/api/post${name}`, item),
-    put: (id, item) => send('PUT', `/${group}/api/put${name}/${encodeURIComponent(id)}`, item),
-    remove: (id) => remove(`/${group}/api/delete${name}/${encodeURIComponent(id)}`),
-  }
+export const login = (username, password) => send('POST', '/user/api/login', { username, password })
+
+export const register = (user) => send('POST', '/user/api/postNewUser', user)
+
+export const getUser = (userid) => read(`/user/api/getUser/${userid}`)
+
+export const courses = {
+  byTeacher: (userid) => read(`/course/api/getCoursesByTeacher/${userid}`),
+  create: (userid, course) => send('POST', `/course/api/postCourse?userid=${userid}`, course),
+  update: (code, course) => send('PUT', `/course/api/putCourse/${encodeURIComponent(code)}`, course),
+  remove: (code) => remove(`/course/api/deleteCourse/${encodeURIComponent(code)}`),
 }
 
-export const users = {
-  getAll: () => read('/user/api/getAllUsers'),
-  post: (user) => send('POST', '/user/api/postNewUser', user),
-  put: (id, user) => send('PUT', `/user/api/putUserEmail?id=${id}`, user),
-  remove: (id) => remove(`/user/api/deleteUser/${id}`),
-}
-
-export const students = resource('student', 'Student')
-export const teachers = resource('teacher', 'Teacher')
-export const courses = resource('course', 'Course')
-export const enrollments = resource('enrollment', 'Enrollment')
-
-export const postNewUser = users.post
-
-export function login(username, password) {
-  return send('POST', '/user/api/login', { username, password })
+export const enrollments = {
+  byStudent: (userid) => read(`/enrollment/api/getEnrollmentsByStudent/${userid}`),
+  byTeacher: (userid) => read(`/enrollment/api/getEnrollmentsByTeacher/${userid}`),
+  countByCourse: (code) => read(`/enrollment/api/countByCourse/${encodeURIComponent(code)}`),
+  join: (userid, code) =>
+    send('POST', `/enrollment/api/joinCourse?userid=${userid}&code=${encodeURIComponent(code)}`),
+  remove: (id) => remove(`/enrollment/api/deleteEnrollment/${id}`),
 }

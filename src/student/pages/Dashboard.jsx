@@ -25,40 +25,25 @@ function EmptyState({ title, text }) {
   )
 }
 
-function Dashboard({ user, onNavigate }) {
-  const [rows, setRows] = useState([])
-  const [loading, setLoading] = useState(true)
+function Dashboard({ user, course, onNavigate }) {
+  const [classmates, setClassmates] = useState(null)
   const [error, setError] = useState('')
+  const code = course.coursecode
 
   useEffect(() => {
     let cancelled = false
     enrollments
-      .getAll()
-      .then((data) => {
-        if (!cancelled) {
-          setRows(data.filter((r) => r.student?.user?.userid === user?.userid))
-        }
+      .countByCourse(code)
+      .then((count) => {
+        if (!cancelled) setClassmates(count)
       })
       .catch((err) => {
         if (!cancelled) setError(err.message)
       })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
     return () => {
       cancelled = true
     }
-  }, [user?.userid])
-
-  const subjects = rows.map((r) => ({
-    id: r.enrollmentid,
-    code: r.course?.coursecode,
-    title: r.course?.title,
-    units: r.course?.units ?? 0,
-    instructor: r.course?.teacher?.user?.fullname,
-  }))
-  const totalUnits = subjects.reduce((sum, s) => sum + s.units, 0)
-  const instructorCount = new Set(subjects.map((s) => s.instructor).filter(Boolean)).size
+  }, [code])
 
   const fullName = user?.fullname || user?.username || 'Student'
   const firstName = fullName.split(' ')[0]
@@ -78,7 +63,7 @@ function Dashboard({ user, onNavigate }) {
           <h1 className="sp-hero-title">
             {greeting}, {firstName}!
           </h1>
-          <p className="sp-hero-sub">Here’s your academic overview for this semester.</p>
+          <p className="sp-hero-sub">Here’s your overview for {course.title}.</p>
         </div>
         <span className="sp-hero-chip">{today}</span>
       </section>
@@ -88,18 +73,19 @@ function Dashboard({ user, onNavigate }) {
       <section className="sp-stats">
         <article className="sp-card">
           <div className="sp-card-head">
-            <h2 className="sp-card-title">Enrolled Subjects</h2>
+            <h2 className="sp-card-title">My Class</h2>
+            <span className="sp-badge sp-badge-blue">{code}</span>
           </div>
-          <div className="sp-big">{loading ? '…' : subjects.length}</div>
-          <p className="sp-muted">Subjects you are enrolled in</p>
+          <strong className="sp-subject-name">{course.title}</strong>
+          <p className="sp-muted">{course.teacher?.user?.fullname || 'No instructor assigned'}</p>
           <div className="sp-mini-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
             <div className="sp-mini">
-              <strong>{totalUnits}</strong>
-              <span>Total units</span>
+              <strong>{course.units}</strong>
+              <span>{course.units === 1 ? 'Unit' : 'Units'}</span>
             </div>
             <div className="sp-mini">
-              <strong>{instructorCount}</strong>
-              <span>Instructors</span>
+              <strong>{classmates ?? '…'}</strong>
+              <span>{classmates === 1 ? 'Student' : 'Students'}</span>
             </div>
           </div>
         </article>
@@ -120,42 +106,6 @@ function Dashboard({ user, onNavigate }) {
           </div>
           <EmptyState title="No quizzes yet" text="Quizzes from your teachers will show up here." />
         </article>
-      </section>
-
-      <section className="sp-card sp-section">
-        <div className="sp-card-head">
-          <h2 className="sp-card-title">My Subjects</h2>
-          <button type="button" className="sp-link" onClick={() => onNavigate('grades')}>
-            View grades
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="sp-loading">Loading your subjects...</div>
-        ) : subjects.length === 0 ? (
-          <EmptyState
-            title="No subjects yet"
-            text="You are not enrolled in any subject. Ask your teacher to enroll you."
-          />
-        ) : (
-          <div className="sp-subjects">
-            {subjects.map((s) => (
-              <div key={s.id} className="sp-subject">
-                <div className="sp-subject-top">
-                  <div>
-                    <strong className="sp-subject-name">{s.title}</strong>
-                    <span className="sp-row-sub">
-                      {s.code}
-                      {s.instructor ? ` · ${s.instructor}` : ''}
-                    </span>
-                  </div>
-                  <span className="sp-badge sp-badge-blue">{s.units} units</span>
-                </div>
-                <p className="sp-muted sp-mt">No grades recorded yet.</p>
-              </div>
-            ))}
-          </div>
-        )}
       </section>
 
       <section className="sp-bottom">

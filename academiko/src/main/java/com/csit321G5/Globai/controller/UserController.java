@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.csit321G5.Globai.dto.RegisterRequest;
 import com.csit321G5.Globai.entity.UserEntity;
 import com.csit321G5.Globai.service.UserService;
 
@@ -24,8 +25,8 @@ public class UserController {
     UserService userv;
 
     @PostMapping("/postNewUser")
-    public UserEntity postUser(@RequestBody UserEntity user) {
-        return userv.postUser(user);
+    public UserEntity postUser(@RequestBody RegisterRequest request) {
+        return userv.postUser(request);
     }
 
     @PostMapping("/login")
@@ -36,6 +37,11 @@ public class UserController {
     @GetMapping("/getAllUsers")
     public List<UserEntity> getAllUsers() {
         return userv.getAllUsers();
+    }
+
+    @GetMapping("/getUser/{id}")
+    public UserEntity getUser(@PathVariable int id) {
+        return userv.getUser(id);
     }
 
     @PutMapping("/putUserEmail")

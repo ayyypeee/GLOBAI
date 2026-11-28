@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { enrollments } from '../api'
 import { usePersisted } from '../shared/usePersisted'
 import './student.css'
 import Dashboard from './pages/Dashboard'
@@ -113,7 +114,24 @@ function StudentApp({ user, onLogout }) {
   const [active, setActive] = usePersisted(`globai-student-tab-${user?.userid}`, 'dashboard')
   const [menuOpen, setMenuOpen] = useState(false)
   const [search, setSearch] = useState('')
-  const [course, setCourse] = usePersisted(`globai-student-class-${user?.userid}`, null)
+  const [stored, setCourse] = usePersisted(`globai-student-class-${user?.userid}`, null)
+
+  const course = stored && stored.coursecode ? stored : null
+  const code = course?.coursecode
+
+  useEffect(() => {
+    if (!code) return
+    let cancelled = false
+    enrollments
+      .byStudent(user.userid)
+      .then((list) => {
+        if (!cancelled && !list.some((e) => e.course.coursecode === code)) setCourse(null)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [code, user.userid, setCourse])
 
   const fullName = user?.fullname || user?.username || 'Student'
   const initials = fullName
@@ -135,18 +153,20 @@ function StudentApp({ user, onLogout }) {
     setActive(key)
     setMenuOpen(false)
   }
-    const logout = () => {
+
+  const logout = () => {
     setCourse(null)
     setActive('dashboard')
     onLogout()
   }
 
-  if (!course) {
-    return <MyClasses user={user} onOpen={setCourse} onLogout={logout} />
+  const open = (picked) => {
+    setActive('dashboard')
+    setCourse(picked)
   }
 
   if (!course) {
-    return <MyClasses user={user} onOpen={setCourse} onLogout={onLogout} />
+    return <MyClasses user={user} onOpen={open} onLogout={logout} />
   }
 
   return (
@@ -214,7 +234,7 @@ function StudentApp({ user, onLogout }) {
               <span className="sp-avatar">{initials || 'S'}</span>
               <div className="sp-profile-text">
                 <strong>{fullName}</strong>
-                <span>Class {course.code}</span>
+                <span>{course.title}</span>
               </div>
             </div>
           </div>
@@ -222,7 +242,7 @@ function StudentApp({ user, onLogout }) {
 
         <main className="sp-content">
           {active === 'dashboard' ? (
-            <Dashboard user={user} onNavigate={go} />
+            <Dashboard user={user} course={course} onNavigate={go} />
           ) : (
             <ComingSoon title={current ? current.label : 'Page'} />
           )}

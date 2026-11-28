@@ -1,5 +1,7 @@
 package com.csit321G5.Globai.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +11,6 @@ import com.csit321G5.Globai.entity.TeacherEntity;
 public interface TeacherRepository extends JpaRepository<TeacherEntity, Integer> {
 
     boolean existsByUser_Userid(int userid);
+
+    Optional<TeacherEntity> findByUser_Userid(int userid);
 }

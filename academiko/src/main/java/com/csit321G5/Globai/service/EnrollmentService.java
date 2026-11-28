@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.csit321G5.Globai.entity.CourseEntity;
 import com.csit321G5.Globai.entity.EnrollmentEntity;
@@ -26,9 +27,32 @@ public class EnrollmentService {
     @Autowired
     CourseRepository crepo;
 
+    @Autowired
+    UserService userv;
+
+    @Transactional
     public EnrollmentEntity postEnrollment(EnrollmentEntity details) {
         EnrollmentEntity enrollment = new EnrollmentEntity();
         fill(enrollment, details);
+        return erepo.save(enrollment);
+    }
+
+    @Transactional
+    public EnrollmentEntity joinCourse(int userid, String code) {
+        StudentEntity student = userv.getStudentProfile(userid);
+        String cleaned = code == null ? "" : code.trim().toUpperCase();
+        if (cleaned.isEmpty()) {
+            throw ApiError.badRequest("Enter a class code.");
+        }
+        CourseEntity course = crepo.findById(cleaned)
+                .orElseThrow(() -> ApiError.notFound("No class found with that code."));
+        if (erepo.findByStudent_StudentidAndCourse_Coursecode(student.getStudentid(), cleaned).isPresent()) {
+            throw ApiError.conflict("You already joined this class.");
+        }
+        EnrollmentEntity enrollment = new EnrollmentEntity();
+        enrollment.setStudent(student);
+        enrollment.setCourse(course);
+        enrollment.setDateenrolled(LocalDate.now());
         return erepo.save(enrollment);
     }
 
@@ -36,12 +60,30 @@ public class EnrollmentService {
         return erepo.findAll();
     }
 
+    public List<EnrollmentEntity> getEnrollmentsByStudent(int userid) {
+        return erepo.findByStudent_User_Userid(userid);
+    }
+
+    public List<EnrollmentEntity> getEnrollmentsByTeacher(int userid) {
+        return erepo.findByCourse_Teacher_User_Userid(userid);
+    }
+
+    public List<EnrollmentEntity> getEnrollmentsByCourse(String code) {
+        return erepo.findByCourse_Coursecode(code);
+    }
+
+    public long countByCourse(String code) {
+        return erepo.countByCourse_Coursecode(code);
+    }
+
+    @Transactional
     public EnrollmentEntity putEnrollment(int id, EnrollmentEntity details) {
         EnrollmentEntity enrollment = find(id);
         fill(enrollment, details);
         return erepo.save(enrollment);
     }
 
+    @Transactional
     public String deleteEnrollment(int id) {
         find(id);
         erepo.deleteById(id);

@@ -109,8 +109,6 @@ function ComingSoon({ title }) {
   )
 }
 
-const notificationCount = 0
-
 function TeacherApp({ user, onLogout }) {
   const [active, setActive] = usePersisted(`globai-teacher-tab-${user?.userid}`, 'dashboard')
   const [menuOpen, setMenuOpen] = useState(false)
@@ -134,11 +132,11 @@ function TeacherApp({ user, onLogout }) {
     onLogout()
   }
 
-    let page
+  let page
   if (active === 'dashboard') {
     page = <Dashboard user={user} onNavigate={go} />
   } else if (active === 'classes') {
-    page = <Classes />
+    page = <Classes user={user} search={search} />
   } else {
     page = <ComingSoon title={current ? current.label : 'Page'} />
   }
@@ -187,7 +185,7 @@ function TeacherApp({ user, onLogout }) {
             <input
               type="text"
               value={search}
-              placeholder="Search students, classes, concerns..."
+              placeholder="Search your classes..."
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
@@ -200,7 +198,6 @@ function TeacherApp({ user, onLogout }) {
               onClick={() => go('concerns')}
             >
               <Icon name="bell" size={19} />
-              {notificationCount > 0 && <span className="tp-bell-badge">{notificationCount}</span>}
             </button>
 
             <div className="tp-profile">
